@@ -96,10 +96,20 @@
           context.restore();
       }
       function create_png() {
+          var strike = parseFloat(document.querySelector('#strike').value);
+          var dip = parseFloat(document.querySelector('#dip').value);
+          var show_strike = document.querySelector('input[value="strike"]').checked;
+          var show_dip = document.querySelector('input[value="dip"]').checked;
+          if(show_strike) { show_strike = 1; } else { show_strike = 0; }
+          if(show_dip) { show_dip = 1; } else { show_dip = 0; }
+          var link = document.getElementById('link');
           var canvas = document.getElementById("canvas");
           // no argument defaults to image/png; image/jpeg, etc also work on some
           // implementations -- image/png is the only one that must be supported per spec.
-          window.location = canvas.toDataURL("image/png");
+          link.setAttribute('download', 's' + strike + 'd' + dip + '_' + show_strike + '' + show_dip + '.png');
+          //window.location = canvas.toDataURL("image/png");
+          link.setAttribute('href', canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
+          link.click();
   }
     </script>
     <br>
@@ -116,5 +126,8 @@
     <br/>
     <input type="checkbox" name="show_dip" value="dip" oninput="draw_symbol()">
     Show Dip
+    <br/>
+    <a href="#" onclick="create_png()">Image</a>
+    <a id="link"></a>
   </body>
 </html>
