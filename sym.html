@@ -25,14 +25,19 @@
           }
           document.querySelector('#strike').value = strike ;
           document.querySelector('#dip').value = dip ;
+	  
           draw_symbol();
+	  var png = getParameterByName("png");
+	  if(png !== null) {
+	      	  
+	  }
       }
       function draw_symbol() {
-	        var strike = parseFloat(document.querySelector('#strike').value);
+	  var strike = parseFloat(document.querySelector('#strike').value);
           var dip = parseFloat(document.querySelector('#dip').value);
           var show_strike = document.querySelector('input[value="strike"]').checked;
           var show_dip = document.querySelector('input[value="dip"]').checked;
-
+          
           document.querySelector('#strike_value').innerHTML = strike;
           document.querySelector('#dip_value').innerHTML = dip;
           var canvas = document.getElementById("canvas");
@@ -79,18 +84,22 @@
               context.font = "25px Helvetica";
               context.fillText(strike, x0 - tick/2 + tick*cs, y0+tick/4-tick*ss);
           }
-          // no argument defaults to image/png; image/jpeg, etc also work on some
-          // implementations -- image/png is the only one that must be supported per spec.
-          //window.location = canvas.toDataURL("image/png");
+          
           context.restore();
       }
+	function create_png() {
+          var canvas = document.getElementById("canvas");
+	  // no argument defaults to image/png; image/jpeg, etc also work on some
+          // implementations -- image/png is the only one that must be supported per spec.
+          window.location = canvas.toDataURL("image/png");
+	}
     </script>
     <br>
-    <input type="range" min="0" max="360" value="0" step="15" id="strike"
+    <input type="range" min="0" max="360" value="0" step="1" id="strike"
            oninput="draw_symbol()">
     <span id="strike_value"></span>
     <br>
-    <input type="range" min="0" max="90" value="0" step="5" id="dip"
+    <input type="range" min="0" max="90" value="0" step="1" id="dip"
            oninput="draw_symbol()">
     <span id="dip_value"></span>
     <br/>
