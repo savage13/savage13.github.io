@@ -1,0 +1,103 @@
+<html>
+  <head></head>
+  <body>
+    <canvas id="canvas" width="120" height="120"></canvas>
+    <script>
+      function getParameterByName(name, url) {
+          if (!url) {
+              url = window.location.href;
+          }
+          name = name.replace(/[\[\]]/g, "\\$&");
+          var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+              results = regex.exec(url);
+          if (!results) return null;
+          if (!results[2]) return '';
+          return decodeURIComponent(results[2].replace(/\+/g, " "));
+      }
+      window.onload = function() {
+          var strike = getParameterByName('strike');
+          if(strike === null) {
+              strike = 45;
+          }
+          var dip = getParameterByName('dip');
+          if(dip === null) {
+              dip = 45;
+          }
+          document.querySelector('#strike').value = strike ;
+          document.querySelector('#dip').value = dip ;
+          draw_symbol();
+      }
+      function draw_symbol() {
+	        var strike = parseFloat(document.querySelector('#strike').value);
+          var dip = parseFloat(document.querySelector('#dip').value);
+          var show_strike = document.querySelector('input[value="strike"]').checked;
+          var show_dip = document.querySelector('input[value="dip"]').checked;
+
+          document.querySelector('#strike_value').innerHTML = strike;
+          document.querySelector('#dip_value').innerHTML = dip;
+          var canvas = document.getElementById("canvas");
+          var context = canvas.getContext("2d");
+          var x0 = canvas.width/2;
+          var y0 = canvas.height/2;
+          var tick = 120 * (1./3.);
+          var buf = 10;
+          var stick = 60;
+          //var strike = 45.0;
+          //var dip = 45;
+          context.save()
+
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          context.lineStyle = "black";
+          context.lineWidth = 3;
+          // Strike
+          var cs = Math.cos((90.0 - strike)*Math.PI/180.);
+          var ss = Math.sin((90.0 - strike)*Math.PI/180.);
+          context.beginPath();
+          context.moveTo(x0+stick*cs, (y0-stick*ss))
+          context.lineTo(x0-stick*cs, (y0+stick*ss));
+          context.stroke();
+          // Dip
+          var cs = Math.cos((90.0 - strike - 90)*Math.PI/180.);
+          var ss = Math.sin((90.0 - strike - 90)*Math.PI/180.);
+          context.beginPath();
+          context.moveTo(x0,y0);
+          context.lineTo(x0+tick*cs,y0-tick*ss);
+          context.stroke();
+          if(show_dip) {
+              // Dip Value
+              var dip = dip.toFixed(0);
+              var cs = Math.cos((90.0 - strike - 90 + 45)*Math.PI/180.);
+              var ss = Math.sin((90.0 - strike - 90 + 45)*Math.PI/180.);
+              context.font = "25px Helvetica";
+              context.fillText(dip, x0-tick/2 + tick*cs, y0+tick/4-tick*ss);
+          }
+          if(show_strike) {
+              // Strike Value
+              var cs = Math.cos((90.0 - strike+35)*Math.PI/180.);
+              var ss = Math.sin((90.0 - strike+35)*Math.PI/180.);
+              var strike = strike.toFixed(0);
+              context.font = "25px Helvetica";
+              context.fillText(strike, x0 - tick/2 + tick*cs, y0+tick/4-tick*ss);
+          }
+          // no argument defaults to image/png; image/jpeg, etc also work on some
+          // implementations -- image/png is the only one that must be supported per spec.
+          //window.location = canvas.toDataURL("image/png");
+          context.restore();
+      }
+    </script>
+    <br>
+    <input type="range" min="0" max="360" value="0" step="15" id="strike"
+           oninput="draw_symbol()">
+    <span id="strike_value"></span>
+    <br>
+    <input type="range" min="0" max="90" value="0" step="5" id="dip"
+           oninput="draw_symbol()">
+    <span id="dip_value"></span>
+    <br/>
+    <input type="checkbox" name="show_strike" value="strike" oninput="draw_symbol()">
+    Show Strike
+    <br/>
+    <input type="checkbox" name="show_dip" value="dip" oninput="draw_symbol()">
+    Show Dip
+  </body>
+</html>
