@@ -23,21 +23,30 @@
           if(dip === null) {
               dip = 45;
           }
+          var show_dip = getParameterByName('show_dip');
+          if(show_dip === null) {
+              show_dip = true;
+          }
+          var show_strike = getParameterByName('show_strike');
+          if(show_strike === null) {
+              show_strike = false;
+          }
           document.querySelector('#strike').value = strike ;
           document.querySelector('#dip').value = dip ;
-	  
+          document.querySelector('input[value="dip"]').checked = show_dip;
+          document.querySelector('input[value="strike"]').checked = show_strike;
           draw_symbol();
-	  var png = getParameterByName("png");
-	  if(png !== null) {
-	      create_png();
-	  }
+          var png = getParameterByName("png");
+          if(png !== null) {
+             create_png();
+          }
       }
       function draw_symbol() {
-	  var strike = parseFloat(document.querySelector('#strike').value);
+          var strike = parseFloat(document.querySelector('#strike').value);
           var dip = parseFloat(document.querySelector('#dip').value);
           var show_strike = document.querySelector('input[value="strike"]').checked;
           var show_dip = document.querySelector('input[value="dip"]').checked;
-          
+
           document.querySelector('#strike_value').innerHTML = strike;
           document.querySelector('#dip_value').innerHTML = dip;
           var canvas = document.getElementById("canvas");
@@ -84,15 +93,14 @@
               context.font = "25px Helvetica";
               context.fillText(strike, x0 - tick/2 + tick*cs, y0+tick/4-tick*ss);
           }
-          
           context.restore();
       }
-	function create_png() {
+      function create_png() {
           var canvas = document.getElementById("canvas");
-	  // no argument defaults to image/png; image/jpeg, etc also work on some
+          // no argument defaults to image/png; image/jpeg, etc also work on some
           // implementations -- image/png is the only one that must be supported per spec.
           window.location = canvas.toDataURL("image/png");
-	}
+  }
     </script>
     <br>
     <input type="range" min="0" max="360" value="0" step="1" id="strike"
