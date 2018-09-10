@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>Chapter 2</title>
+    <meta charset="utf-8" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.css" integrity="sha384-D+9gmBxUQogRLqvARvNLmA9hS2x//eK1FhVb9PiU86gmcrBrJAQT8okdJ4LMp2uv" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.js" integrity="sha384-483A6DwYfKeDa0Q52fJmxFXkcPCFfnXMoXblOkJ4JcA8zATN6Tm78UNL72AKk+0O" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/contrib/auto-render.min.js" integrity="sha384-yACMu8JWxKzSp/C1YV86pzGiQ/l1YUfE8oPuahJQxzehAjEt2GiQuy/BIvl9KyeF" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+    <script src="chp1.js"></script>
+    </head>
+  <body>
+    <a name="p01"/><h2>Problem 2.1</h2>
+
+    <p>
+      Determining the orientation of the formations in the map requires using the "Law of Vs"
+
+      <ul>
+        <li> Does the formation ignore the topography - Vertical Formation 
+        <li> Does the formation follow the topography - Horizontal Formation
+        <li> Formation V points downstream - Formation dips downstream
+        <li> Formation is along the stream bed - Formation at same dip as Valley
+        <li> Formation V is more obtuse than Topography V - Formation dips upstream
+        <li> Formation V is more acute than Topography V - Formation dip downstream
+      </ul>
+
+      <a name="p03"/><h2>Problem 2.3</h2>
+
+      <h3>Three point problem</h3>
+
+      <p>
+        <b>Review</b> How many points define a line? Two. How many points define a plane? Three.
+
+      <p>
+        Given 3 points with known depths, or (\(x,y,z)\), to a thing of interest, water, a bed, a formation find the orientation of formation, or plane.
+      <p>
+    <b>Note</b> We assume the thing is planar, if it is not, say it is folded, we cannot use this method properly.
+
+    <p>
+      <canvas id="canvasp23a" width=300 height=300></canvas>
+    <p>
+      Lets start by determining the Strike \(\theta\). Draw a line from the largest value \(C\)to the smallest value \(A\).
+    <p>
+      <b>Reference</b> This line \(A-C\) lies along the plane of interest and it changes its depth from the largest to smallest values linearly.
+    <p>
+    <canvas id="canvasp23b" width=300 height=300></canvas>
+    
+    <p>
+      Now determine the middle point's \(B\)  is along the line \(A-C\). The form this takes is $$ \Delta_{map} (A-B) = \Delta_{map} (A-C) \frac{B_z - A_z}{C_z - A_z}$$ where \(\Delta_{map}()\) is distance in map units, measured with a ruler, and \(A_z, B_z\) and \(C_z\) are the provided depths. 
+    <p>
+      Call this new point \(D\) and draw the line \(B-D\).
+    <p>
+      <b>Reference</b> The depth along the line \(B-D\) is same and lies in the plane of interest.  An official name is a structural contour.  The direction of this line is the strike \(\theta\).
+
+    <p>
+      <b>Measure the strike: </b> The orientation of the line \(B-D\) from North.
+
+      <canvas id="canvasp23c" width=300 height=300></canvas>
+
+    <p>
+      <b>Determine the dip.</b>
+    <p>
+      <b><i>Warning:</i></b> This is usually the place where most people get confused because you have been asked to measure an angle from the surface with only looking at the surface. 
+      
+    <p>
+      To determine the dip we will need the following equation $$\tan \delta = \frac{\Delta z}{\Delta x}$$ where \(\delta\) is the dip, \(\Delta x\) is the horizontal distance and \(\Delta z\) is the vertical distance between two points. But which two points?
+
+    <p>
+      <b>Remember</b> the dip is:
+      <ol>
+        <li>an angle measured from the horizontal
+        <li>perpendicular to the strike
+      </ol>
+
+      <p>
+        We have a strike line, \(B-D\), so lets draw a line perpendicular to it.  But where do we draw the line? The line should go through a known point, we have  \(A\) and \(C\), pick one<a href="#footnotes"><sup>[1]</sup></a>.
+      <p>
+        So lets draw a line from point \(A\) to line \(B-D\) that is perpendicular to \(B-D\). This magically creates two points: \(E\) and \(E'\) where \(E_z = A_z\) and \(E'_z = B_z\)<a href="#footnotes"><sup>[2]</sup></a>.
+
+      <p>
+        <b>Reference</b> Point \(E\) <b>is not</b> on the plane, it is the same depth as \(A\).  Point \(E'\) <b>is </b> on the plane as it has the same depth of \(B\) and is on the structure contour line \(B-D\).
+
+      <p>
+        <canvas id="canvasp23d" width=300 height=300></canvas>
+
+      <p>
+        Compute the real-world <b>vertical</b> distance from \(E\) to \(E'\), or \(\Delta z = E'_z - E_z \).
+      <p>
+        Measure the distance in map units, \(\Delta_{map}(A-E)\), and convert it to real-world horizontal distance via $$\Delta x = \Delta_{map}(A-E) \frac{\Delta_{real}(\text{scalebar})}{\Delta_{map}(\text{scalebar})}$$
+
+      <p>
+        <b>Reminder:</b> \(\Delta_{real}(\text{scalebar})\) is that little number over the scale bar and \(\Delta_{map}(\text{scalebar})\) is the length of the scalebar in map units, say <i>cm</i>.  This equation is basic <a href="https://en.wikipedia.org/wiki/Conversion_of_units">unit conversion</a> you probably learned in Introductory Chemistry.
+      <p>
+        <canvas id="canvasp23e" width=300 height=300></canvas>
+      <p>
+        Now that we have \(\Delta x \) and \(\Delta z\) we can rearrange the \(\tan \delta = \frac{\Delta x }{ \Delta z}\)  equation to determine the dip. $$ \delta = \tan^{-1}{\frac{\Delta z}{\Delta x} } =
+        \text{atan}{\frac{\Delta z}{\Delta x} } $$
+
+        <a name="footnotes"/>
+        <h3>Footnotes:</h3>
+        <ol>
+          <li> corresponding to your expected grade
+          <li> Really ?
+        </ol>
+        
+      <script>
+        function three_point_problem(stage) {
+            var id = "canvasp23" + stage;
+            var c = canvas(id);
+            var show_structure_contours = false;
+            var show_cross_section = false;
+
+            var pA = {x: 50, y: 50};
+            var pB = {x: 225, y: 50};
+            var pC = {x: 115, y: 250};
+            var zA = 100.;
+            var zB = 230.;
+            var zC = 300.;
+
+            c.point(pA);
+            c.point(pB);
+            c.point(pC);
+
+            c.text('A ' + zA.toFixed(1), pA);
+            c.text('B ' + zB.toFixed(1), pB);
+            c.text('C ' + zC.toFixed(1), pC);
+
+            if(stage >= 'b') {
+                // Line From Biggest to Smallest :: A-C
+                c.line(pA, pC);
+            }
+
+            // Find Depth of B on Line A-C
+            var r = dist(pA,pC) * (zB-zA)/(zC-zA);
+            var pD = from_pt(pA, r, angle_to(pA, pC));
+            if(stage >= 'c') {
+                c.point(pD);
+                c.text('D ' + zB.toFixed(1), pD);
+
+                // Line From B to D
+                c.line(pB, pD);
+            }
+            // Determine the Strike - Angle of line B-D
+            var aBD = angle_to(pD,pB);
+            // Auxillary Points and Lines
+            if(show_structure_contours) {
+                var pC2 = from_pt(pC, dist(pB,pD), aBD);
+                c.point(pC2)
+                c.text("C' " + zC.toFixed(1), pC2);
+                c.line(pC, pC2, color='gray');
+                var pA2 = from_pt(pA, dist(pB,pD), aBD);
+                c.line(pA, pA2, color='gray');
+                c.text("A' " + zA.toFixed(1), pA2);
+            }
+            // Determine the Dip
+            var ptmp = from_pt(pA, 150, aBD+90);
+            var pE = line_intersection(pA, ptmp, pB, pD);
+            if(stage >= 'd') {
+                c.text('E  ' + zA.toFixed(1), pE);
+                c.text("E'  " + zB.toFixed(1), from_pt(pE, -20, -90));
+                c.point(pE);
+                c.line(pA,pE);
+            }
+            var dx = dist(pA,pE);
+            var dz = Math.abs(zB,zA);
+            var dip = Math.atan2(dz, dx);
+
+            // Cross Section Triangle
+            if(show_cross_section) {
+                var qA = {x: 130, y: 225};
+                c.point(qA);
+                c.text("A " + zA.toFixed(1), qA);
+                var qE = from_pt(qA, dx, 0);
+                c.point(qE);
+                c.text("E " + zA.toFixed(1), qE);
+                c.line(qA,qE);
+                var qEB = from_pt(qE, dz/3, -90);
+                c.point(qEB);
+                c.text("E' " + zB.toFixed(1), qEB);
+                c.line(qE,qEB);
+                c.line(qA,qEB);
+
+                var ang1 = angle_to(qA,qE);
+                var ang2 = angle_to(qA,qEB);
+                var ang = (ang1+ang2)/ 2.0;
+                var r = dist(qA,qE)/2.0;
+                var qtmp = from_pt(qA, r*0.8, ang);
+                c.text("\u03b4", qtmp);
+                c.arc(qA, r, -ang1, -ang2, anticlockwise=false);
+                c.text('\u0394z', from_pt(qE, dz/3./2., -90));
+                c.text('\u0394x', from_pt(qA, dx/2, 0));
+            }
+            if(stage >= 'e') {
+                c.text('\u0394x', from_pt(pA, dist(pA,pE)/2, angle_to(pA,pE)));
+                c.text('\u0394z', from_pt(pE, 70, 10));
+            }
+
+            
+        }
+three_point_problem('a');
+three_point_problem('b');
+three_point_problem('c');
+three_point_problem('d');
+three_point_problem('e');
+      </script>
+  </body>
+
+</html>

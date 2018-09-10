@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>Chapter 2</title>
+    <meta charset="utf-8" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.css" integrity="sha384-D+9gmBxUQogRLqvARvNLmA9hS2x//eK1FhVb9PiU86gmcrBrJAQT8okdJ4LMp2uv" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.js" integrity="sha384-483A6DwYfKeDa0Q52fJmxFXkcPCFfnXMoXblOkJ4JcA8zATN6Tm78UNL72AKk+0O" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/contrib/auto-render.min.js" integrity="sha384-yACMu8JWxKzSp/C1YV86pzGiQ/l1YUfE8oPuahJQxzehAjEt2GiQuy/BIvl9KyeF" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+    <script src="chp1.js"></script>
+    </head>
+  <body>
+    <a name="p01"/><h2>Problem 3.1</h2>
+    <p>
+    <b> Determine the Strike and Dip of a Bed</b>
+      
+    <p>
+    This is your <a href="chp02.html#p03">three-point problem friend</a> again, but somewhat simplified.
+
+    <p>
+      Find a topographic contour that intersects the base of the unit twice: <b>This is the strike.</b> Draw that structure contour.
+    <p>
+      Find a different topographic contour that intersects the base of the unit twice. Draw that structure contour.
+    <p>
+      Use the diference in elevation, \(\Delta z\) and the horizontal distance in real-world units, \(\Delta x\) perpendicular to the structure contours, or the strike to <b>determine the dip</b> of the unit via $$\delta = \tan^{-1}\frac{\Delta z}{\Delta x}$$
+
+      
+    <p>
+      <b>Warning:</b> Sometimes the units do not have more than one explicit contour that intersects the base.  Be resourceful and creative.
+
+    <a name="p02"/><h2>Problem 3.2</h2>
+
+    <p>
+      <b>Determining the Thickness of a Bed</b>
+
+    <p>
+      The best place to measure the thickness is where the topography is flat or along a topographic contour; provided that contour is perpendicular to the strike \(\theta\).  The dips of the bed are available. Use the equation $$t = \Delta x \sin \delta$$ where \(t\) is the thickness, \(\Delta x\) is the horizontal distance and \(\delta\) is the bed's dip.
+    <p>
+      If it is not flat, you will need to use a slightly more complex set of equations:
+    <p>
+      If the bedding dips more steeply than topography in the same direction
+      $$ t = \Delta x \sin \delta - \Delta z \cos\delta $$
+    <p>
+      If the bedding dips less steeply than topography in the same direction
+      $$ t = \Delta z \cos\delta - \Delta x \sin \delta  $$
+    <p>
+      If the bedding dips in the opposite direction to topography 
+      $$ t = \Delta x \sin \delta + \Delta z \cos\delta    $$
+    
+    <script>
+    </script>
+  </body>
+
+</html>

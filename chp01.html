@@ -1,0 +1,413 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Chapter 1</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.css" integrity="sha384-D+9gmBxUQogRLqvARvNLmA9hS2x//eK1FhVb9PiU86gmcrBrJAQT8okdJ4LMp2uv" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.js" integrity="sha384-483A6DwYfKeDa0Q52fJmxFXkcPCFfnXMoXblOkJ4JcA8zATN6Tm78UNL72AKk+0O" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/contrib/auto-render.min.js" integrity="sha384-yACMu8JWxKzSp/C1YV86pzGiQ/l1YUfE8oPuahJQxzehAjEt2GiQuy/BIvl9KyeF" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+    <script src="chp1.js"></script>
+</head>
+  <body>
+    <a name="p01"/>
+      <h2>Problem 1.1</h2>
+      Geographic directions can written in two different ways, by <b>azimuth</b> or <b>quadrant</b>
+      <br/>
+      <h3>Azimuth</h3>
+      Degrees from north normally using three digits.
+      Examples:
+      <br/>
+      <pre>
+        000&#176;       North
+        090&#176;       East
+        180&#176;       South
+        270&#176;       West
+        360&#176;       North
+       -090&#176;       West
+       -270&#176;       East, but unnecessarilly confusing
+       -045&#176;       NorthWest
+       -022&#176;       North by North West
+      </pre>
+
+      <h3>Quadrant</h3>
+          Degrees from a reference direction in a specified direction
+      <pre>
+        N        North
+        E        East
+        S        South
+        W        West
+        N45&#176;W    North West at 45&#176;
+        N45&#176;E    North East at 45&#176;
+        S45&#176;W    South West at 45&#176;
+        S10&#176;W    South West at 10&#176;
+        N3&#176;E     North East at 3&#176;
+      </pre>
+
+    <a name="p03"/>
+    <h2>Problem 1.3</h2>
+
+    Is the line element contained within the plane? Or does the line intersect the plane in a single point or every point?  <a href="https://en.wikipedia.org/wiki/Line%E2%80%93plane_intersection">Reference</a>
+
+    Use the interative plane/line to help visualize the problem being solved here.
+
+    <h3>Definitions</h3>
+    <ul>
+      <li> \( \theta \) - Plane Strike
+      <li> \( \delta \) - Plane Dip
+      <li> \( \phi \) - Line Trend
+      <li> \( \alpha \) - Line Plunge
+      <li> \( \theta_\delta \) - Plane Dip Direction
+    </ul>
+    
+    <h3>Requirements</h3>
+    <ul>
+      <li> Line plunge is not steeper than the plane
+        <ul><li> \( \alpha <= \delta \)</ul>
+      <li> Line plunges in the same direction as the plan
+        <ul><li> \( | \phi - \theta_\delta | <= 90 \)</ul>
+      <li> Direction must satify an equation
+    </ul>
+    <h3>Special Cases</h3>
+    <ol>
+      <li> Line along the Dip
+        <ul><li> \( \phi = \theta_\delta \) and \( \alpha = \delta \)</ul>
+      <li> Line along the Strike
+        <ul><li>\( \phi = \theta \) and \(\alpha = 0\)</ul>
+    </ol>
+
+    <a name="p04"/>
+    <h3>Definitions</h3>
+    <ul>
+      <li> \( \delta \) - Plane Dip
+      <li> \( \theta \) - Plane Strike
+      <li> \( \theta_\delta \) - Plane Dip Direction
+      <li> \( \alpha \) - Apparent Dip
+      <li> \( \theta_\alpha \) - Apparent Dip Direction
+      <li> \( \beta \) - Angle between Strike and Apparent Dip Direction
+    </ul>
+
+    <h2>Problem 1.4</h2>
+    <p>Find \(\delta\),
+    Given \( \theta , \alpha\) and \( \theta_\alpha \) using Orthographic Projection.
+    <p>
+      This method is done graphically using a ruler and protractor.
+    <p>
+
+      Example: Find \(\delta\), given   \( \theta = N45^\circ E , \alpha = 10^\circ\) and \( \theta_\alpha = N15^\circ E\) 
+      
+    <p>
+      First we need to put down on paper the things that we know
+      <ul>
+        <li>\(\theta \) - Strike (Geographic direction)
+        <li>\(\theta_\alpha \) Apparent Dip direct (Geographic Direction)
+        <li>\(\alpha \) - Apparent Dip
+      </ul>
+      The two geographic directions are just two lines at the appropriate angles relative to North. The strike is in red and the apparent dip direction is in blue.
+      <p>
+    <canvas id="canvasp14a" width=300 height=300></canvas>
+    <div id="debug"></div>
+
+<p>
+    We also know the direction of the dip, just because we know the strike. $$ \theta_\delta = \theta + 90 $$
+
+<p>
+Lets draw that too, in fuchsia, just not at the intersection of the other two lines.
+    <p>
+    You will notice it is perpendicular to the line of strike \( \theta \) and intersects the apparent dip direction \( \theta_\alpha \) forming a right triangle, in green.
+    <p>
+Focusing on the triangle in green, find the intersection of the apparent dip \(\theta_\alpha \) and dip directions \( \theta_\delta \), call it point \(DA\). The intersection between the strike \(\theta\) and dip direction \(\theta_\delta\) we will call \(SD\) and the strike \(\theta \) and apparent dip direction \(\theta_\alpha\) intersection is \(SA\).
+    <p>
+    <b>Reality Check</b> What we have drawn so far are only geographic direction, i.e. horizontal lines along the surface.  Now we are going to draw some vertical lines and triangles, but they will be drawn as "folded up" to the horizontal plane or the surface.
+    <p>
+
+    <canvas id="canvasp14b" width=300 height=300 ></canvas>
+
+    <p>
+
+    At \(DA\), draw a line perpendicular from \(\theta_\delta\) and another from \(\theta_\alpha\), away from the triangle.
+    <canvas id="canvasp14c" width=300 height=300 tabindex="1" ></canvas>
+
+    <p>
+      At \(SA\), measure an angle \(\alpha\) from the apparent dip direction line away from the green surficial triangle. Lets call the intersection, point \(A\).
+      
+    <p>
+      At this point we have constructed a triangle associated with the apparent dip \(\alpha\), something we were given.  This triangle is formed by
+      <ul>
+        <li> The line between \(SA\) to \(DA\) along the surface in the direction of the apparent dip \(\theta_\alpha\)
+        <li> The line from \(DA\) to \(A\) which represents a direction straight down or vertical.
+        <li> The line from \(SA\) to \(A\) which represents a line along the plane in question. This line has a slope.
+      </ul>
+
+    <canvas id="canvasp14d" width=300 height=300 tabindex="1" ></canvas>
+
+    <p>
+    Measure the distance between the \(DA\) and \(A\) and transfer that along the other line. Lets call the new point \(D\).
+
+    <canvas id="canvasp14e" width=300 height=300 tabindex="1" ></canvas>
+    <p>
+      Draw a line from \(A\) to \(SD\). This should form another triangle associated with the dip \(\delta\), the thing we are interested in. As with the apparent dip triangle it is formed by
+      <ul>
+        <li> The line between \(SD\) to \(DA\) along the surface in the direction of the dip \(\theta_\delta\)
+        <li> The line from \(DA\) to \(D\) which represents a direction straight down or vertical.
+        <li> The line from \(SD\) to \(D\) which represents a line along the plane in question. This line has a slope.
+      </ul>
+
+    <p>
+      Measure  angle formed by \(D - SD - DA\) to determine the dip of the plane \(\delta\)
+    <canvas id="canvasp14f" width=300 height=300 tabindex="1" ></canvas>
+
+    <a name="p05"/>
+      <h2>Problem 1.5</h2>
+    <p>Find \(\alpha\),
+      Given \( \theta , \delta\) and \( \theta_\alpha \) using Orthographic Projection.
+
+    <p>The procedure is the same as in previous problem by
+      <ol>
+        <li> Draw \(\theta\), \(\theta_\alpha\), and \(\theta_\delta\) forming the triangle.
+        <li> Draw two perpendicular lines at \(DA \)
+        <li> Measure \(\delta\) from \(\theta_\delta\) at \(SD\) making point \(D\)
+        <li> Measure distance \(DA-D\) line and transfer to other line making point \(A\)
+        <li> Draw line from \(A\) to \(SA\)
+        <li> Measure angle between line \(SA-A\) and \(SA-DA\)
+      </ol>
+      
+      
+      <a name="p08"/>
+    <h2>Problem 1.8</h2>
+    Find \(\delta\),
+    Given \( \theta , \alpha\) and \( \theta_\alpha \)
+    <br/>
+    Compute \(\beta = \theta - \theta_\alpha\)<br/>
+    Make sure \(0 <= \beta <= 90\)
+    <br/>
+    Solve for \(\delta\)
+    $$\tan \delta = \frac{\tan \alpha}{\sin \beta}$$
+
+    <a name="p09"/>
+    <h2>Problem 1.9</h2>
+    Find \(\alpha\),
+    Given \( \theta , \delta\) and \( \theta_\alpha \)
+    <br/>
+    Compute \(\beta = \theta - \theta_\alpha\)<br/>
+    Make sure \(0 <= \beta <= 90\)
+    <br/>
+    Solve for \(\alpha\)
+    $$\tan \delta = \frac{\tan \alpha}{\sin \beta}$$
+    $$\tan \delta \sin \beta = \tan \alpha$$
+
+    <a name="p12"/>
+    <h2>Problem 1.12</h2>
+
+    Compute \( \beta \) - Angle between the strike and apparent dip<br>
+    Make sure \(0 <= \beta <= 90\)
+    <br>
+    Use the alignment diagram
+
+
+      <script>
+
+
+var w = 300.0;
+var h = 300.0;
+var x0 = 100.;
+var y0 = 50.;
+var r0 = 200.;
+var strike = 45.0;
+var theta_alpha = 15.0;
+var alpha = 25.0;
+var px1 = 170.;
+var py1 = 170.;
+
+strike = 90.0 - strike;
+theta_alpha = 90.0 - theta_alpha;
+
+function part_1(id, show) {
+    // Problem 1.4
+    var canvas = document.getElementById(id);
+    var ctx = canvas.getContext('2d');
+
+    geoline(ctx,x0,y0,r0,strike, h, 'red', 2);
+    geoline(ctx,x0,y0,r0,theta_alpha, h ,'blue',2);
+
+    north_arrow(ctx, w, h);
+    scale_bar(ctx, w, h);
+    if(show) {
+        var p = from_pt({x:x0,y:y0}, 190, strike);
+        ctx.fillStyle = 'red';
+        ctx.fillText("\u03b8", p.x, h-p.y-8);
+        var p = from_pt({x:x0,y:y0}, 190, theta_alpha);
+        ctx.fillStyle = 'blue';
+        ctx.fillText("\u03b8 \u03b1", p.x-12, h-p.y);
+    }
+    return ctx;
+}
+function label_DA(ctx,z2) {
+    ctx.fillStyle = "black";
+    ctx.fillText("DA", z2.x-2, h-z2.y+30);
+}
+function label_SA(ctx,z1) {
+    ctx.fillStyle = "black";
+    ctx.fillText("SA", z1.x+5, h-z1.y+10);
+}
+function label_SD(ctx,z3) {
+    ctx.fillStyle = "black";
+    ctx.fillText("SD", z3.x-5, h-z3.y+20);
+}
+
+function part_2(id, show) {
+    var ctx = part_1(id, false)
+    geoline(ctx,px1,py1,r0, strike+90, h, 'fuchsia',2);
+
+    var z1 = line_line_inter(x0,y0,theta_alpha,  x0,y0,strike);
+    var z2 = line_line_inter(x0,y0,theta_alpha,  px1,py1, strike+90.);
+    var z3 = line_line_inter(x0,y0,strike,       px1,py1, strike+90.);
+
+    if(show) {
+        var p = from_pt(z3, 50, strike-90);
+        ctx.fillStyle = 'fuchsia';
+        ctx.fillText("\u03b8 \u03b4", p.x+10, h-p.y+10);
+    }
+
+    var x = [z1.x, z2.x, z3.x];
+    var y = [h-z1.y, h-z2.y, h-z3.y];
+
+    if(show) {
+        ctx.fillStyle = 'black';
+        label_SA(ctx, z1);
+        label_SD(ctx, z3);
+        label_DA(ctx, z2);
+    }
+    // Triangle
+    poly(ctx, x, y, 'rgba(0,256,0,0.15)', 'black')
+    return [ctx,z1,z2,z3];
+}
+
+function part_3(id, show) {
+    var rv = part_2(id,false);
+    var ctx = rv[0];
+    var z1 = rv[1];
+    var z2 = rv[2];
+    var z3 = rv[3];
+    // Vertical line for dip triangle
+    line(ctx,
+         [z2.x,     (z2.x + 100. * cosd(strike))],
+         [h-z2.y, h-(z2.y + 100. * sind(strike))],
+         'black',2);
+    // Vertical line for apparent dip triangle
+    line(ctx,
+         [  z2.x,   (z2.x + 100. * cosd(theta_alpha + 90))],
+         [h-z2.y, h-(z2.y + 100. * sind(theta_alpha + 90))],
+         'black',2);
+    if(show) {
+        label_DA(ctx, z2);
+    }
+//}
+    return [ctx,z1,z2,z3];
+}
+
+function part_4(id, show) {
+    var rv = part_3(id,false);
+    var ctx = rv[0];
+    var z1 = rv[1];
+    var z2 = rv[2];
+    var z3 = rv[3];
+
+    //point(ctx, x[0],y[0], 6, 'rgba(256,0,0,0.5)','rgba(0,0,0,0.5)')
+    //point(ctx, x[1],y[1], 6, 'rgba(256,0,0,0.5)','rgba(0,0,0,0.5)')
+    //point(ctx, x[2],y[2], 6, 'rgba(256,0,0,0.5)','rgba(0,0,0,0.5)')
+
+    if(show) {
+        var p1 = from_pt(z1, 40, theta_alpha + alpha*0.7)
+        ctx.strokeStyle = 'black';
+        ctx.fillStyle = 'black';
+        ctx.fillText("\u03b1", p1.x,h-p1.y);
+        //var p1 = from_pt(z1, 40, (strike + theta_alpha)/2);
+        //ctx.fillText("\u03b2", p1.x,h-p1.y);
+        label_SA(ctx, z1);
+        label_DA(ctx, z2);
+    }
+
+    // Apparent Dip Line
+    line(ctx,
+         [  z1.x,   (z1.x + 180. * cosd(theta_alpha + alpha))],
+         [h-z1.y, h-(z1.y + 180. * sind(theta_alpha + alpha))],
+         'black',2);
+
+    var z4 = line_line_inter(z2.x, z2.y, theta_alpha + 90,
+                             z1.x, z1.y, theta_alpha + alpha);
+    if(show) {
+        point(ctx, z4.x,h-z4.y, 6, 'rgba(256,0,0,0.5)','rgba(0,0,0,0.5)')
+        ctx.fillStyle = 'black';
+        ctx.fillText("A", z4.x-5, h-z4.y-15);
+    }
+    return [ctx, z1,z2,z3,z4];
+}
+part_1('canvasp14a',true);
+part_2('canvasp14b',true);
+
+part_3('canvasp14c',true);
+part_4('canvasp14d',true);
+
+function part_5(id,show) {
+    var rv = part_4(id, false);
+    var ctx = rv[0];
+    var z1 = rv[1];
+    var z2 = rv[2];
+    var z3 = rv[3];
+    var z4 = rv[4];
+
+    var d = dist(z2,z4);
+    var p1 = from_pt(z2, d/2.0, theta_alpha + 90.0);
+    var p2 = from_pt(z2, d/2.0, strike);
+    ctx.strokeStyle = 'black';
+    ctx.fillStyle = 'black';
+    if(show) {
+        ctx.fillText('d', p1.x,h-p1.y);
+        ctx.fillText('d', p2.x,h-p2.y);
+        label_DA(ctx, z2);
+    }
+    var z5 = from_pt(z2, d, strike);
+
+    point(ctx, z5.x, h-z5.y, 6, 'rgba(256,0,0,0.5)','rgba(0,0,0,0.5)');
+    ctx.fillStyle = 'black';
+    ctx.fillText("D", z5.x-5, h-z5.y-15);
+    return [ctx, z1,z2,z3,z4,z5];
+}
+function part_6(id, show) {
+    var rv = part_5(id,false);
+    var ctx = rv[0];
+    var z1 = rv[1];
+    var z2 = rv[2];
+    var z3 = rv[3];
+    var z4 = rv[4];
+    var z5 = rv[5];
+
+    line(ctx, [z5.x, z3.x], [h-z5.y, h-z3.y], 'black', 2);
+
+    var v35 = vsub(z3, z5);
+    var v32 = vsub(z3, z2);
+    var v25 = vsub(z2, z5);
+
+    label_SD(ctx, z3);
+    label_DA(ctx, z2);
+
+    var dip = angle_between(v32, v35);
+
+    var p1 = from_pt(z3, 30, strike + 90 - dip/2);
+    ctx.strokeStyle = 'black';
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
+    ctx.fillText('d', p1.x,h-p1.y);
+    ctx.fillText("\u03b4", p1.x,h-p1.y);
+}
+
+part_5('canvasp14e', true);
+part_6('canvasp14f', true);
+
+</script>
+
+  </body>
+</html>
