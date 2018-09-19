@@ -483,7 +483,7 @@ function drawScene() {
     mvPushMatrix();
     {
         var plunge = document.getElementById("plunge").value;
-        var trendv = 90.0 - document.getElementById("trend").value;
+        var trendv = 90.0 - document.getElementById("trend").value - 90.0;
 
         var x = document.getElementById("x").value;
         var y = document.getElementById("y").value;
