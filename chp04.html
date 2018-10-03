@@ -33,6 +33,44 @@
     <p>
     If you "unfold" the bed, the correct direction should be where the younging direction points up. *Provide the entire structure has not been overturned.*
 
+    <p>
+      <h4>Apparent Dip Calculator</h4>
+
+      <script>
+        function adip_form() {
+        var strike = document.getElementById('strike').value;
+        var dip = document.getElementById('dip').value;
+        var adipd = document.getElementById('adipd').value;
+
+        var beta = strike - adipd;
+        if( beta < 0.0 ) {
+            beta = -beta;
+        }
+        if(beta > 90.0) {
+            beta = 180.0 - beta;
+        }
+        //var adip = document.getElementById('adip').value;
+        //var beta = document.getElementById('beta').value;
+        document.getElementById('beta').value = beta.toFixed(4);
+        var d2r = Math.PI / 180.0;
+        var r2d = 1.0 / d2r;
+
+        var adip = r2d * Math.atan(Math.sin(beta * d2r) * Math.tan(dip * d2r));
+
+        document.getElementById('adip').value = adip.toFixed(4);
+
+        }
+      </script>
+      <table border=0>
+        <tr><td>Strike:</td><td><input type="number" id="strike" value="-15" onchange="adip_form()"></td><td>\(\theta\)</td></tr>
+        <tr><td>Dip: </td><td><input type="number" id="dip" value="82" onchange="adip_form()"></td><td>\(\delta\)</td> </tr>
+        <tr><td>Apparent Dip Direction: </td><td><input type="number" id="adipd" value="90" onchange="adip_form()"></td><td>\(\theta_\alpha\)</td><td>Cross Section Orientation</td> </tr>
+        <tr><td>Beta \(\beta\): </td><td><input type="number" id="beta" value="45" onchange="adip_form()"></td><td>\(\beta\)</td> </tr>
+        <tr><td>Apparent Dip: </td><td><input type="number" id="adip" value="82" onchange="adip_form()"></td><td>\(\alpha\)</td> </tr>
+      </table>
+      
+
+      
     <a name="p02"/><h2>Problem 4.2</h2>
 
     Draw the cross section along A-A'
