@@ -42,9 +42,9 @@
         var dip = document.getElementById('dip').value;
         var adipd = document.getElementById('adipd').value;
 
-        var beta = strike - adipd;
-        if( beta < 0.0 ) {
-            beta = -beta;
+        var beta = Math.abs(strike - adipd);
+        if( beta > 180.0 ) {
+            beta = 360.0 - beta;
         }
         if(beta > 90.0) {
             beta = 180.0 - beta;
