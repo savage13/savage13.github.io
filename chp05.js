@@ -190,8 +190,17 @@ function show_answer_p54p2() {
     }, 1000, 0);
 }
 
+function pole_to_lat_lon(net, trend, plunge) {
+
+    var d2r = Math.PI / 180.0;
+    var angle = trend * d2r;
+    var r = plunge / 90.0 * net.radius;
+    var r = Math.sqrt(1.0 - (r * r));
+    
+}
 
 function show_answer_p58() {
+    return;
     var s1 = 45;
     var d1 = 20;
     var s2 = 235-180
@@ -241,5 +250,5 @@ function show_answer_p58() {
 var c51 = new Stereonet("#c51");
 var c52 = new Stereonet("#c52");
 var c54 = new Stereonet("#c54");
-var c58 = new Stereonet("#c58");
+//var c58 = new Stereonet("#c58");
 
