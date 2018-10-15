@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>Chapter 12</title>
+    <meta charset="utf-8" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.css" integrity="sha384-D+9gmBxUQogRLqvARvNLmA9hS2x//eK1FhVb9PiU86gmcrBrJAQT8okdJ4LMp2uv" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.js" integrity="sha384-483A6DwYfKeDa0Q52fJmxFXkcPCFfnXMoXblOkJ4JcA8zATN6Tm78UNL72AKk+0O" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/contrib/auto-render.min.js" integrity="sha384-yACMu8JWxKzSp/C1YV86pzGiQ/l1YUfE8oPuahJQxzehAjEt2GiQuy/BIvl9KyeF" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+
+    <script language="javascript" type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+	<script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.js"></script>
+	<script language="dashpot.js" type="text/javascript" src="dashpot.js"></script>
+  <style>
+    .demo-container {
+    border: 0px solid red;
+	  box-sizing: border-box;
+  	width: 100%;
+	  height: 400px;
+	padding: 20px 15px 15px 15px;
+	margin: 15px auto 30px auto;
+}
+
+    #placeholder {
+     border: 0px solid red;
+    }
+    
+    .demo-placeholder {
+	width: 100%;
+	height: 100%;
+	font-size: 14px;
+	line-height: 1.2em;
+}
+    #canvas {
+    border: 0px solid red;
+    }
+    .legend table {
+	  border-spacing: 5px;
+    font-size: 28px;
+    }
+.legend {
+    font-size: 1.05em;
+    background: #eeeeee;
+}
+.name {
+    display: inline-block;
+    width: 35%;
+    font-size: 1.0em;
+    font-weight: bold;
+    padding-left: 5pt;
+    padding-right: 5pt;
+}
+.value {
+    display: inline-block;
+    width: 15%;
+    font-size: 1.0em;
+    font-weight: bold;
+    padding-left: 5pt;
+    padding-right: 5pt;
+}
+
+  </style>
+    </head>
+  <body>
+    <a name="p01"/><h2>Problem 12.1</h2>
+    This problem can be solved by using the rheological modeling tool below.
+    
+    		<div class="demo-container">
+          <div id="placeholder" class="demo-placeholder">
+            <div id="legendholder" class="legend"></div>
+          </div>
+        </div>
+    <center>
+    <select id="model" class="styled-select">
+      <option value="e">Elastic</option>
+      <option value="v">Viscous</option>
+      <option value="max">ViscoElastic (Maxwell)</option>
+      <option value="kv">ViscoElastic (Kelvin Voigt)</option>
+      <option value="s">Three Element Series Model</option>
+      <option value="s2">Three Element Parallel Model</option>
+      <!-- <option value="gen">General Model</option> -->
+    </select>
+    </center>
+    <br style="margin: 10pt;"/>
+    <center>
+      <table  border=0 width="90%"><tr>
+          <td width="100%" align="center">
+            <div id="ElasticModel">
+              <span class="name">Elastic Modulus</span>
+              <input id="elastic" type="range", min="0.1", max="20", step="0.1"//>
+              <span id="elasticvalue" class="value"></span>
+            </div>
+            <div id="ViscousModel">
+              <span class="name">Viscous Modulus</span>
+              <input id="viscous" type="range", min="0.1", max="20", step="0.1"/>
+              <span id="viscousvalue" class="value"></span>
+            </div>
+            <div id="MaxwellModel">
+              <div>
+                <span class="name">Elastic Modulus</span>
+                <input id="max_elastic" type="range", min="0.1", max="20", step="0.1"/>
+                <span id="max_elasticvalue" class="value"></span>
+              </div>
+              <div>
+                <span class="name">Viscous Modulue</span>
+                <input id="max_viscous" type="range", min="0.1", max="20", step="0.1"/>
+                <span id="max_viscousvalue" class="value"></span>
+              </div>
+            </div>
+            <div id="KelvinVoigtModel">
+              <div>
+                <span class="name">Elastic Modulus</span>
+                <input id="kv_elastic" type="range", min="0.1", max="20", step="0.1"/>
+                <span id="kv_elasticvalue" class="value"></span>
+              </div>
+              <div>
+                <span class="name">Viscous Modulus</span>
+                <input id="kv_viscous" type="range", min="0.1", max="20", step="0.1"/>
+                <span id="kv_viscousvalue" class="value"></span>
+              </div>
+            </div>
+
+            <div id="SeriesModel">
+              <div>
+                <span class="name">Elastic 1 Modulus</span>
+                <input id="s_elastic1" type="range", min="0.1", max="20", step="0.1"/>
+                <span id="s_elastic1value" class="value"></span>
+              </div>
+              <div>
+                <span class="name">Elastic 2 Mouduls</span>
+                <input id="s_elastic2" type="range", min="0.1", max="20", step="0.1"/>
+                <span id="s_elastic2value" class="value"></span>
+              </div>
+              <div>
+                <span class="name">Viscous Modulus</span>
+                <input id="s_viscous" type="range", min="0.1", max="20", step="0.1"/>
+                <span id="s_viscousvalue" class="value"></span>
+              </div>
+            </div>
+
+            <div id="SeriesTwoModel">
+              <div>
+                <span class="name">Elastic 1 Modulus</span>
+                <input id="s2_elastic1" type="range", min="0.1", max="20", step="0.1"/>
+                <span id="s2_elastic1value" class="value"></span>
+              </div>
+              <div>
+                <span class="name">Elastic 2 Mouduls</span>
+                <input id="s2_elastic2" type="range", min="0.1", max="20", step="0.1"/>
+                <span id="s2_elastic2value" class="value"></span>
+              </div>
+              <div>
+                <span class="name">Viscous Modulus</span>
+                <input id="s2_viscous" type="range", min="0.1", max="20", step="0.1"/>
+                <span id="s2_viscousvalue" class="value"></span>
+              </div>
+            </div>
+
+            <!--
+            <div id="General">
+              <div>
+                <span class="name">Constant A</span>
+                <input id="gen_constant" type="range", min="10", max="100", step="10"/>
+                <span id="gen_constantvalue" class="value"></span>
+              </div>
+              <div>
+                <span class="name">Temperature</span>
+                <input id="gen_temperature" type="range", min="100", max="1300", step="50"/>
+                <span id="gen_temperaturevalue" class="value"></span>
+              </div>
+              <div>
+                <span class="name">Activation Energy</span>
+                <input id="gen_estar" type="range", min="50", max="100", step="10"/>
+                <span id="gen_estarvalue" class="value"></span>
+              </div>
+              <div>
+                <span class="name">Power (n)</span>
+                <input id="gen_power" type="range", min="1", max="5", step="1"/>
+                <span id="gen_powervalue" class="value"></span>
+              </div>
+            </div>
+            -->
+          </td>
+
+          <td width="50%">
+            <canvas id="canvas" width="400px" height="150px"></canvas>
+          </td>
+        </tr>
+      </table>
+    </center>
+
+
+    <a name="p02"/><h2>Problem 12.2</h2>
+    Use the rheological modeling tool to gain an insight into how to incorporate the strain rate differences of silly putty.
+
+    <p>
+      Contsrtuct a model that is reasonable and give reasons why you choose the model you did
+
+    <a name="p03"/><h2>Problem 12.3</h2>
+
+    Things to contemplate:
+    <ul>
+      <li> Strain of the system
+      <li> Time over which the strain occurs
+      <li> Stress for the system
+      <li> Are these items constant or do they vary in space or time.
+    </ul>
+    
+    
+  </body>
+
+</html>
