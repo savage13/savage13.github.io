@@ -3,7 +3,7 @@
 [Line Fitting](LineFitting.html)
 
 ### Data Sets
-   - DJIA - [DJIA.csv][DJIA.csv]
+   - DJIA - [DJIA.csv](DJIA.csv)
        - Find Financial Crises or Steep Market Drops
    - Planetary Orbits - [orbits.txt](orbits.txt)
        - Find the planets and which ones are going backwards
