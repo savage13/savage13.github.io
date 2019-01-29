@@ -10,8 +10,8 @@
    - GPS - [gps_albh.txt](gps_albh.txt)
        - Find the plate velocity
        - What is remaining when the plate motion is removed
-   - Long Term Newport Tide Gauge - [tide_gauge_long.txt](tide_gauge_long.txt)
+   - Long Term Newport Tide Gauge - [tide_newport_long.txt](tide_newport_long.txt)
        - What is the rate of Sea Level Rise
-   - Short Term Newport Tide Gauge - [tide_gauge_short.txt](tide_gauge_short.txt)
+   - Short Term Newport Tide Gauge - [tide_newport_short.txt](tide_newport_short.txt)
        - What is the periodicity of the tide and their amplitude
 
