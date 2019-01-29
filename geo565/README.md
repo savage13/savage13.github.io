@@ -1,6 +1,6 @@
 # GEO 565 Notes
 
-[Line Fitting](./LineFitting.ipynb)
+[Line Fitting](./LineFitting.html)
 - Homework
   -
 - Data Sets
