@@ -2,7 +2,7 @@
 
 [Line Fitting](./LineFitting.html)
 
-- Data Sets
+### Data Sets
    - DJIA - DJIA.csv
        - Find Financial Crises or Steep Market Drops
    - Planetary Orbits - orbits.txt
