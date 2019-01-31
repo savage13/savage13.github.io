@@ -14,4 +14,6 @@
        - What is the rate of Sea Level Rise
    - Short Term Newport Tide Gauge - [tide_newport_short.txt](tide_newport_short.txt)
        - What is the periodicity of the tide and their amplitude
-
+   - Very Long Term Tide Gauge - at Brest [h822a.csv](http://uhslc.soest.hawaii.edu/data/csv/rqds/atlantic/hourly/h822a.csv)
+       - What is the periodicity of the tides and their amplitude
+       - [Tidal Constituents](https://en.wikipedia.org/wiki/Theory_of_tides#Tidal_constituents)
