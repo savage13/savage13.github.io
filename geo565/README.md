@@ -2,6 +2,8 @@
 
 [Line Fitting](LineFitting.html)
 
+[Periodic Signals](PeriodicSignals.html)
+
 ### Data Sets
    - DJIA - [DJIA.csv](DJIA.csv)
        - Find Financial Crises or Steep Market Drops
