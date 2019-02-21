@@ -4,6 +4,8 @@
 
 [Periodic Signals](PeriodicSignals.html)
 
+[Seismology](Seismology.html)
+
 ### Data Sets
    - DJIA - [DJIA.csv](DJIA.csv)
        - Find Financial Crises or Steep Market Drops
