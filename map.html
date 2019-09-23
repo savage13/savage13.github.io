@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+  </head>
+  <body>
+    <h1>Mapping Options:</h1>
+    <ul>
+      <li><a href="#arc">ArcGIS Online - Complex option</a>
+      <li><a href="#geojson">geojson.io - Simple Option</a>
+    </ul>
+
+    <a name="geojson"></a>
+    <h2>geojson.io - Simple Option</h2>
+    <a href="http://geojson.io">geojson.io</a>
+    <ul>a
+      <li>Zoom into Beavertail
+      <li>Click on the Satellite button at the bottom
+      <li>Use the marker tool to create a point
+      <li>Use the table tool to create metadata for your point
+      <li>Click the Square with a pen (Above the trash can) to edit the points
+      <li>You can also directly edit the location in the JSON data field
+      <li>Save the data using Save/CSV
+    </ul>
+
+    <a name="arc"></a>
+    <h2>ArcGSI Online - Complex Option</h2>
+    <a href="https://www.arcgis.com/home/">ArcGIS Online</a>
+    <ol>
+      <li> Go to <a href="https://www.arcgis.com/home/">ARC GIS Online</a>
+      <li> Create a free account
+      <li> Click on "Map"<br/>
+        <img src="img/arc_online_header.png" width="100%"></img>
+      <li> Click on "New Map" - "Create New Map" (on the right hand side)
+        <br/>
+        <img src="img/create_new_map.png" width="100%"></img>
+      <li> Zoom into Beavertail State Park
+      <li> Change "Basemap" to "Imagery"<br/>
+        <img src="img/change_basemap.png" width="100%"></img>
+
+      <li> Create a CSV file to contain your data.  You can create this in Google Sheets, Excel, in a text editor or <a href="http://geojson.io">online</a>.  I would suggest the online option as it is interactive and shows you where the point are.  In fact, using the online mapping may be sufficient for this initial data set.
+        <br/>
+        The first line should be a header that describes the data, including Latitude and Longitude.  Locations should be in decimal degrees,  To convert from minutes to decimal degrees, use
+        <pre> Decimal Degrees = Integral Degrees + (Partial Minutes / 60.0) </pre>
+      <li> Load this data onto the map using "Add" - "Add Layer from File" or Drop the CSV file onto the map.  <br/>
+        It is best to start with one point and get that to work, then add the remaining points.  An <a href="http://geojson.io">interative site</a> might be more useful for inputing data; the data can be downloaded as CSV and dropped onto the GIS map.
+
+    </ol>
+  </body>
+</html>
