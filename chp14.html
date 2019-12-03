@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>Chapter 14</title>
+    <meta charset="utf-8" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.css" integrity="sha384-D+9gmBxUQogRLqvARvNLmA9hS2x//eK1FhVb9PiU86gmcrBrJAQT8okdJ4LMp2uv" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.js" integrity="sha384-483A6DwYfKeDa0Q52fJmxFXkcPCFfnXMoXblOkJ4JcA8zATN6Tm78UNL72AKk+0O" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/contrib/auto-render.min.js" integrity="sha384-yACMu8JWxKzSp/C1YV86pzGiQ/l1YUfE8oPuahJQxzehAjEt2GiQuy/BIvl9KyeF" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+    <script language="javascript" type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+	  <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.js"></script>
+    
+    <script type="text/javascript">
+
+var plot;
+
+function update() {
+    var s1 = $("#sigma1").val() * 1.0;
+    var s3 = $("#sigma3").val() * 1.0;
+    draw_mohr_circle(s1, s3, false);
+}
+
+$(function() {
+    draw_mohr_circle(100, 20, true);
+    
+    $("#sigma1").on("input", function() {
+        var s1 = $(this).val() * 1.0;
+        var s3 = $("#sigma3").val() * 1.0;
+        if(s1 <= s3){
+            s1 = s3;
+        }
+        $(this).val( s1 );
+        $("#sigma1value").html( s1 );
+        update();
+    } );
+    $("#sigma3").on("input", function() {
+        var s1 = $("#sigma1").val() * 1.0;
+        var s3 = $(this).val() * 1.0;
+        if(s3 >= s1){
+            s3 = s1;
+        }
+        $(this).val( s3 );
+        $("#sigma3value").html( s3 );
+        update();
+    } );
+    $("#sigma1").val( 100 );
+    $("#sigma3").val( 20 );
+    $("#sigma1value").html( 100 );
+    $("#sigma3value").html( 20 );
+});
+function draw_mohr_circle(s1, s3, init){
+    var d1 = [];
+    var c = (s1+s3)/2.0;
+    var r = (s1-s3)/2.0;
+    //alert(s1 + " " + s3 + " " + c + " " + r );
+		for (var i = 0; i < 360; i += 5) {
+        var a = i * Math.PI / 180.0;
+			  d1.push([c + r * Math.cos(a), r * Math.sin(a)]);
+		}
+    var xmin = -120;
+    var xmax = 220;
+    var ymax = r * 1.10;
+
+    if(init) {
+        plot = $.plot("#placeholder", [
+            {
+	    	        data: d1,
+			          lines: { show: true, fill: false }, color: "black",
+		        },
+            { data: [[0, -xmax], [0, xmax]],  lines: { show: true, fill: false }, color: "black" },
+            { data: [[-xmax,0], [xmax,0 ]],   lines: { show: true, fill: false }, color: "black" },
+        ],
+               {
+                   xaxis: { min: xmin, max: xmax,},
+                   yaxis: { min: xmin-50, max: xmax-50}
+               }
+              );
+    } else {
+        //alert(d1[0]);
+        plot.setData([{ data: d1,                       lines: { show: true, fill: false  },  color: "black"},
+                      { data: [[0, -xmax], [0, xmax]],  lines: { show: true, fill: false }, color: "black" },
+                      { data: [[-xmax,0], [xmax,0 ]],   lines: { show: true, fill: false }, color: "black" },
+                     ]);
+        plot.setupGrid();
+        plot.draw();
+    }
+    
+}
+    
+     </script>
+  <style>
+        .demo-container {
+    border: 0px solid red;
+	  box-sizing: border-box;
+  	width: 400px;
+	  height: 400px;
+	padding: 20px 15px 15px 15px;
+	margin: 15px auto 30px auto;
+}
+    #placeholder {
+     border: 0px solid red;
+    }
+    .demo-placeholder {
+	width: 100%;
+	height: 100%;
+	font-size: 14px;
+	line-height: 1.2em;
+}
+.name {
+    display: inline-block;
+    width: 35%;
+    font-size: 1.0em;
+    font-weight: bold;
+    padding-left: 5pt;
+    padding-right: 5pt;
+}
+.value {
+    display: inline-block;
+    width: 15%;
+    font-size: 1.0em;
+    font-weight: bold;
+    padding-left: 5pt;
+    padding-right: 5pt;
+}
+
+  </style>
+    
+  </head>
+  <body>
+    <a name="p01"/><h2>Problem 14.1</h2>
+
+    <ol>
+      <li>Use the equation $$e = \frac{l_1-l_0}{l_0}$$ where \(l_0\) is measured from Subfigure a and \(l_1\) is measured from Subfigure b, both along the hinge line
+      <li> Use the equation $$\gamma = \tan \Psi$$ to determine the angular shear and the shear strain.  Measured the change in angle \(\Psi \)of the line that was originally perpendicular to the hinge line.
+    </ol>
+
+    
+    <a name="p02"><h2>Problem 14.2</h2>
+      For each subfigure, except the first one (a), measure the dimensions of the grains, the long and short axes.  Try to take 5 measurements of the long axis and 5 measurement of the short axis if possible.
+      <p>
+      Calculate the mean of the long and short values and take the ratio of these means to get $$1 + e_1 : 1 + e_2$$.  For reference, use Figure 14.3 as a example.  There is no need to add \(1\) to the mean values.
+
+      <p>
+      Finally, draw an example deformed grain in the box provided below the images.
+      <a name="p08"><h2>Problem 14.8</h2>
+
+        Just as in 14.2, measure the long and short axes of a collection of grains; write those values in the lines provided
+        <p>
+          Take the mean of the long and short axes. That goes in the \(\bar{x}\) line.
+        <p>
+          Deterine the ratios $$1+e_2 : 1+e_3$$ and $$1+e_1 : 1+e_3$$
+          Remember, it is not necessary to add \(1\) to these values
+
+        <p>
+          Combine those ratios to determine  $$1+e_1 : 1+e_2 : 1+e_3$$
+
+          using the following relationship:
+
+          $$\frac{1+e_1}{1+e_2} = \frac{1+e_1}{1+e_3}\frac{1+e_3}{1+e_2}$$
+
+          Make sure the value of \(1+e_3 = 1.0\)
+        <p>
+          Plot those ratios on the graph provided
+
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+  </body>
+</html>
