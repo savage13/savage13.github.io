@@ -1,0 +1,267 @@
+<html>
+  <head>
+	<link type="text/css" 
+	      href="css/ui-lightness/jquery-ui-1.7.1.custom.css"
+	      rel="stylesheet" />
+	<script type="text/javascript" 
+		src="js/jquery-1.3.2.min.js"></script>
+	<script type="text/javascript" 
+		src="js/jquery-ui-1.7.1.custom.min.js"></script>
+	<link rel="stylesheet" media="screen" type="text/css" 
+	      href="css/colorpicker.css" />
+	<script type="text/javascript" src="js/colorpicker.js"></script>
+	<link type="text/css" href="css/net.css" rel="stylesheet" />
+	<script type="text/javascript" src="js/colornames.js"></script>
+	<script type="text/javascript" src="js/Plane.js"></script>
+	<script type="text/javascript" src="js/colorscale.js"></script>
+	<script type="text/javascript" src="stereonet.js"></script>
+	<script src="jdraw.js"></script>
+  </head>
+  <body>
+    <div id="container">
+      <canvas id="net" width="500px" height="500px">
+        <p>Unfortunately, your browser is currently unsupported by our web 
+          application.  We are sorry for the inconvenience. Please use one 
+          of the supported browsers listed below, or draw the image you 
+          want using an offline tool.</p>
+        <p>Supported browsers: 
+          <a href="http://www.opera.com">Opera</a>,
+          <a href="http://www.mozilla.com">Firefox</a>, 
+          <a href="http://www.apple.com/safari">Safari</a>, and 
+          <a href="http://www.konqueror.org">Konqueror</a>.
+        </p>
+      </canvas>
+    </div>
+    <div id="tabs" class="ui-tabs" >
+      <ul>
+	<li><a href="#tabs-data">Data</a></li>
+	<li><a href="#tabs-options">Options</a></li>
+	<li><a href="#tabs-help">Help</a></li>
+	<li><a href="#tabs-howto">Howto</a></li>
+	<li><a href="#tabs-save">Save</a></li>
+      </ul>
+      <!-- Data Tab -->
+      <div id="tabs-data"  class="ui-tabs-hide">
+	<form id="addform">
+          <div class="input">
+            <span id="plane_pole_input" >
+              Strike:<input class="plane" id="strike" size="5" type="text" />
+              Dip: <input class="plane" id="dip" size="5"  type="text">
+            </span>
+            <span id="small_circle_input">
+              Angle: <input class="small_circle" id="sc_angle" size="5" type="text"/>
+            </span>
+            <select id="object_type">
+              <option selected="selected">Plane</option>
+              <option>Pole</option>
+              <option>Pole (Mouse)</option>
+              <option>Small Circle</option>
+              <option>Text Input</option>
+            </select>
+	    <span id="add_input">
+              <input type="button" value="Add" id="add">
+            </span>
+            <span id="mouse_input">
+              <input value="Cancel" type="button" id="mouse_cancel"/>
+            </span>
+            <span id="text_input">
+              <br/>
+              <textarea name="textdata" id="textdata" rows=10 cols=30></textarea>
+              <br/>
+            </span>
+	  </div>
+	</form>
+	<table id="data" class="zebra">
+          <tr class="headers">
+            <td id="count"></td>
+            <td>Strike</td>
+            <td>Dip</td>
+            <td>Pole/Plane</td>
+            <td>Type</td>
+            <td>Color</td>
+          </tr>
+	</table>
+	<form>
+	  <div class="optionbox">
+            <span class="optiontext" id="angle">Angle: 0.0</span>
+            <span class="optionvalue">
+              <input type="button" value="Return to 0" id="zero"/>
+            </span>
+	  </div>
+	</form>
+        <span id="mouse">0.0</span>
+        <div>
+          <div id="debug"></div>
+        </div>
+	<form>
+	  <div class="contourbox">
+            <span class="contourvalue">
+              <input type="button" value="Contour" id="contour"/>
+            </span>
+	  </div>
+	</form>
+      </div>
+      <div id="tabs-save" class="ui-tabs-hide">
+        <span class="optionvalue"><input type="button" value="Save" id="save"/></span>
+        <br/><hr/>
+        <div id="dump"></div>
+      </div>
+      
+      <!-- Help Tab -->
+      <div id="tabs-help"  class="ui-tabs-hide">
+	    <dl>
+          <dt>Planes
+            <dd> Shown as lines, think of a plane intersecting a bowl</dd>
+          <dt>Lines
+            <dd> Shown as points, think of a line intersecting a bowl</dd>
+          <dt>Great Cirle
+            <dd> North South Lines </dd>
+          <dt> Small Cirle
+            <dd> East West Lines </dd>
+          <dt> Primitive Circle
+            <dd>Outside circle</dd>
+        </dl>
+      </div>
+      <div id="tabs-howto"  class="ui-tabs-hide">
+        <ul>
+          <li>Pole of a Plane
+            <ol>
+              <li> Draw the plane
+              <li> Rotate the net so the plane is striking north-south 
+              <li> Along the east-west line count over 90 degrees and mark this point, this is the <b>pole</b>
+              <li> Rotate the plane back to its original position
+            </ol>
+          <li>Intersection of two planes
+            <ol>
+              <li> Draw both planes, the crossing of the lines represents the intersection of the planes
+              <li> Rotate the intersetion point to the east west line
+              <li> Measure the angle from the primitive circle to the intersection, this is the <b>plunge</b>
+              <li> Mark the primitive circle on the side closest to the intersection
+              <li> Rotate the intersection point back to the original position
+              <li> The mark on the primitive circle is the <b>trend</b> of the intersection
+            </ol>
+          <li> True Dip from strike and a apparent dip
+            <ol>
+              <li> Draw a line along the strike with a dip of 90 degrees
+              <li> Mark the primitive circle at the trend of the apparent dip
+              <li> Rotate the apparent dip trend to the east-west line
+              <li> Measure from the primitive circle inwards and mark the apparent dip
+              <li> Rotate the strike line so it is oriented north south
+              <li> Measure the dip of the great cirle that the apparent dip mark lies on, this is the <b>true dip</b>
+            </ol>
+          <li> Strike and Dip from two apparent dips
+            <ol>
+              <li> Mark both apparent dip
+              <li> Rotate the dips until both fall on the same great circle, draw this great circle
+              <li> Measure the <b>true dip</b> from the center to the great circle
+              <li> Mark the north point
+              <li> Rotate the plane and dips back to the original position
+              <li> The previously marked north point is the <b>strike</b> of the plane
+            </ol>
+          <li> Two - tilt probelm
+            <ol>
+              <li> Plot the poles of both formations
+              <li> Rotate the younger of the poles to the east-west line
+              <li> Rotate the pole along the east west line to the center of the net, measure this angle
+              <li> Rotate the other pole along a small circle by the same amount as the first pole
+              <li> Rotate all the net back to its original position
+            </ol>
+          <li> Todo: 
+            <ol> 
+              <li> Rotating poles along small circles
+            </ol>
+        </ul>
+      </div>
+      <div id="color" class="colorpick">
+	<div class="colorpick_value"></div>
+      </div>
+      
+      <!-- Options Tab -->
+      <div id="tabs-options"  class="ui-tabs-hide">
+	<div class="optionbox">
+	  <form>
+	    <span class="optiontext" >Type of Projection:</span>
+	    <span class="optionvalue">
+	      <input type="radio" 
+		     name="projection" 
+		     value="-1" 
+		     id="projection_equal_area"
+		     class="drawing_options_projection"
+		     checked="checked" />Equal Area
+	      <br/>
+	      <input type="radio" 
+		     name="projection" 
+		     value="-1" 
+		     id="projection_equal_angle"
+		     class="drawing_options_projection"/>Equal Angle
+	    </span>
+	  </form>
+	</div> 
+	<div class="optionbox">
+	    <form>
+	      <span class="optiontext" >Width of plane line</span>
+	      <span class="optionvalue">
+		<input type="text" 
+		       id="plane_width" 
+		       class="drawing_options"
+		       size="5" 
+		       value="2" />
+	      </span>
+	    </form>
+	</div>
+	<div class="optionbox">
+	    <form>
+	      <span class="optiontext" >Size of pole</span>
+	      <span class="optionvalue">
+		<input type="text" 
+		       id="pole_size" 
+		       class="drawing_options"
+		       size="5" 
+		       value="5" />
+	      </span>
+	    </form>
+	</div>
+	<div class="optionbox">
+	    <form>
+	      <span class="optiontext" >Width of reference lines</span>
+	      <span class="optionvalue">
+		<input type="text" 
+		       id="reference_width" 
+		       class="drawing_options"
+		       size="5" 
+		       value="0.3" />
+	      </span>
+	    </form>
+	</div>
+	<div class="optionbox">
+	  <form>
+	    <span class="optiontext">Circle Spacing</span>
+	    <span class="optionvalue">
+	      <input type="text" 
+		     id="reference_spacing" 
+		     class="drawing_options"
+		     size="5" 
+		     value="10" />
+	    </span>
+	  </form>
+          <form>
+            <div  class="optionbox">
+              <span class="optiontext">Show original Stereonet</span>
+              <span class="optionvalue">
+                <input type="checkbox" class="drawing_options" 
+                       checked="checked" id="show_original_net"/>
+              </span>
+            </div>
+          </form>
+          <form>
+	    <div class="optionbox">
+              <span >
+                <input type="button" value="Reset" id="reset"/>
+              </span>
+	    </div>
+          </form>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

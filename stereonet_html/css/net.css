@@ -1,0 +1,49 @@
+      body { font-size: 11px;  }
+      table { font-size: 11px;  }
+      #container { position: relative; float:left; }
+      #tabs { 
+         float: left;
+         border: 1px solid black; 
+         width: 40%;
+      }
+      #data { width: 100%;   }
+      #zero { float: right;  }
+      #reset { float: right;  }
+      #addform { 
+         padding: 2px;
+      }
+      .optionbox {
+         clear: both;
+         float: left;
+         width: 100%;
+         border-top: solid 1px #000000;
+         padding-top: 5px;
+         padding-bottom: 5px;
+      }
+      .optiontext {
+         width: 50%;
+         float: left;
+      }
+      .optionvalue {
+         float: left;
+      }
+      .colorpick {
+         width:  10px;
+         height: 10px;
+      }
+      .color_value {
+         width: 100%;
+         height: 100%;
+         background-color: black;
+      }
+      tr.alt td {
+         background: #fcf1db;
+      }
+      .headers td {
+         font-weight: bold;
+         border-bottom: solid 1px black;
+      }
+      .direction {
+         font-size: 8px;
+         display: inline;  
+      }
