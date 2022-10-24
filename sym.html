@@ -25,7 +25,7 @@
           }
           var show_dip = getParameterByName('show_dip');
           if(show_dip === null) {
-              show_dip = true;
+              show_dip = false;
           }
           var show_strike = getParameterByName('show_strike');
           if(show_strike === null) {
@@ -46,7 +46,7 @@
           var dip = parseFloat(document.querySelector('#dip').value);
           var show_strike = document.querySelector('input[value="strike"]').checked;
           var show_dip = document.querySelector('input[value="dip"]').checked;
-
+          var symbol = document.querySelector('#symbol').value
           document.querySelector('#strike_value').innerHTML = strike;
           document.querySelector('#dip_value').innerHTML = dip;
           var canvas = document.getElementById("canvas");
@@ -61,8 +61,8 @@
           context.save()
 
           context.clearRect(0, 0, canvas.width, canvas.height);
-          context.lineStyle = "black";
-          context.lineWidth = 3;
+          context.strokeStyle = "black";
+          context.lineWidth = 7;
           // Strike
           var cs = Math.cos((90.0 - strike)*Math.PI/180.);
           var ss = Math.sin((90.0 - strike)*Math.PI/180.);
@@ -70,13 +70,30 @@
           context.moveTo(x0+stick*cs, (y0-stick*ss))
           context.lineTo(x0-stick*cs, (y0+stick*ss));
           context.stroke();
-          // Dip
-          var cs = Math.cos((90.0 - strike - 90)*Math.PI/180.);
-          var ss = Math.sin((90.0 - strike - 90)*Math.PI/180.);
-          context.beginPath();
-          context.moveTo(x0,y0);
-          context.lineTo(x0+tick*cs,y0-tick*ss);
-          context.stroke();
+          if(symbol == "strike_and_dip") {
+              // Dip
+              var cs = Math.cos((90.0 - strike - 90)*Math.PI/180.);
+              var ss = Math.sin((90.0 - strike - 90)*Math.PI/180.);
+              context.beginPath();
+              context.moveTo(x0,y0);
+              context.lineTo(x0+tick*cs,y0-tick*ss);
+              context.stroke();
+          }
+          if(symbol == "clevage") {
+              var cs1 = Math.cos((90.0 - strike)*Math.PI/180.);
+              var ss1 = Math.sin((90.0 - strike)*Math.PI/180.);
+              var cs2 = Math.cos((90.0 - strike - 90)*Math.PI/180.);
+              var ss2 = Math.sin((90.0 - strike - 90)*Math.PI/180.);
+              const ctick = tick*0.9;
+              context.beginPath();
+              context.moveTo(x0,y0);
+              context.lineTo(x0+ctick*cs1, y0-ctick*ss1);
+              context.lineTo(x0+ctick*cs2, y0-ctick*ss2);
+              context.lineTo(x0-ctick*cs1, y0+ctick*ss1);
+              context.closePath();
+              context.stroke();
+              context.fill();
+          }
           if(show_dip) {
               // Dip Value
               var dip = dip.toFixed(0);
@@ -100,13 +117,14 @@
           var dip = parseFloat(document.querySelector('#dip').value);
           var show_strike = document.querySelector('input[value="strike"]').checked;
           var show_dip = document.querySelector('input[value="dip"]').checked;
+          var symbol = document.querySelector('#symbol').value
           if(show_strike) { show_strike = 1; } else { show_strike = 0; }
           if(show_dip) { show_dip = 1; } else { show_dip = 0; }
           var link = document.getElementById('link');
           var canvas = document.getElementById("canvas");
           // no argument defaults to image/png; image/jpeg, etc also work on some
           // implementations -- image/png is the only one that must be supported per spec.
-          link.setAttribute('download', 's' + strike + 'd' + dip + '_' + show_strike + '' + show_dip + '.png');
+          link.setAttribute('download', `${symbol}_s${strike}d${dip}_${show_strike}_${show_dip}.png`);
           //window.location = canvas.toDataURL("image/png");
           link.setAttribute('href', canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
           link.click();
@@ -125,7 +143,12 @@
     Show Strike
     <br/>
     <input type="checkbox" name="show_dip" value="dip" oninput="draw_symbol()">
-    Show Dip
+    Show Dip 
+    <br/>
+    <select type="select" id="symbol" name="symbol" oninput="draw_symbol()">
+      <option value="strike_and_dip">Strike and Dip</option>
+      <option value="clevage">Cleavage</option>
+    </select>
     <br/>
     <a href="#" onclick="create_png()">Image</a>
     <a id="link"></a>
