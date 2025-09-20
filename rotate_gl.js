@@ -258,7 +258,7 @@ function handleKeys() {
 
 var cube;
 var plane;
-var line;
+var xline;
 var north;
 var north1;
 var north2;
@@ -409,7 +409,7 @@ function initBuffers() {
     plane  = cube_create_simple(x,y,z,[0,r0,0,alpha]);
     var z  = 0.02;
     var x  = 1.1;
-    line   = cube_create_simple(x,y,z,[0,0,r0,alpha]);
+    xline   = cube_create_simple(x,y,z,[0,0,r0,alpha]);
     var x  = 0.2;
     north  = cube_create_simple(x,y,z,[0,0,0,alpha]);
     var x  = 0.075;
@@ -504,7 +504,7 @@ function drawScene() {
         mat4.rotate(mvMatrix, mvMatrix, degToRad(-0.0), [1, 0, 0]); // 6 x-axis rotation
         mat4.translate(mvMatrix, mvMatrix, dx1); // 1
 
-        show_item(line);
+        show_item(xline);
     }
     mvPopMatrix();
 

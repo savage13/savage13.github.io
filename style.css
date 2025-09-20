@@ -1,21 +1,39 @@
-body {
-  width: 60%;
-  padding-left: 20%;
-  font-family: Tahoma, Geneva, sans-serif;
-  font-size: 0.9em;
+@media only screen and (min-width: 800px) {
+  body {
+    padding-right: 5%;
+    padding-left: 5%;
+  }
+  canvas {
+      width: 500px;
+      height: 500px;
+      padding-left: 0;
+      padding-right: 0;
+      margin-left: auto;
+      margin-right: auto;
+  }
 }
+body {
+    font-family: Tahoma, Geneva, sans-serif;
+}
+
 h2 {
   border-bottom: 2px solid black;  
 }
 canvas {
-  padding-left: 0;
-  padding-right: 0;
-  margin-left: auto;
-  margin-right: auto;
   display: block;
   border: 1px solid black;
 }
 
 .net {
     border: 0px;
+}
+pre {
+    overflow-x:auto;
+}
+
+.tableblock {
+    border-collapse: collapse;
+}
+.tableblock tr {
+    border-bottom: 1px solid black;
 }

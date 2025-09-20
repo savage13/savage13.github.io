@@ -1,20 +1,19 @@
-
 function apply_defaults( defaults, input ) {
     for (key in defaults) {
         input[key] = (typeof input[key] == 'undefined') ? defaults[key] : input[key];
     }
     return input;
-    
+
 }
 
 function plane_undefined(obj) {
-    if( obj.strike == NaN || 
+    if( obj.strike == NaN ||
         obj.dip    == NaN ||
-        obj.strike == undefined || 
+        obj.strike == undefined ||
         obj.dip    == undefined ||
-	! (obj.strike >= -180 && obj.strike <= 360 && 
+  ! (obj.strike >= -180 && obj.strike <= 360 &&
            obj.dip >= 0 && obj.dip <= 90)) {
-	return true;
+  return true;
     }
     return false;
 }
@@ -27,7 +26,7 @@ var Style = function(obj) {
     obj = apply_defaults(def, obj);
     this.width   = obj.width;
     this.color   = obj.color;
-    
+
     this.stroke = function(net) {
         net.cx.strokeStyle = "#" + colorNameToHex(this.color);
         net.cx.lineWidth   = this.width;
@@ -82,9 +81,9 @@ var SmallCircle = function(obj) {
         this.style.color = color;
     }
     this.text = function() {
-        return( 'smallcircle ' + 
-                this.angle + ' ' + 
-                this.rotation + ' ' + 
+        return( 'smallcircle ' +
+                this.angle + ' ' +
+                this.rotation + ' ' +
                 this.style.text() );
     }
     this.error = 0;
@@ -123,10 +122,22 @@ var Plane = function( obj ) {
 
     obj = apply_defaults(def, obj);
     if( plane_undefined( obj ) ) {
-        return;
+        if(obj.type == "pole" && obj.dip > 90 && obj.strike !== undefined) {
+            obj.dip = 180.0 - obj.dip
+            obj.strike = zero_360(obj.strike + 180)
+        } else {
+            console.log("plane undefined: ", obj)
+            return;
+        }
     }
-    this.strike  = obj.strike * 1.0; 
+    this.strike  = obj.strike * 1.0;
     this.dip     = obj.dip * 1.0;
+    if(this.dip > 90) {
+        //console.log(`dip > 90 strike: ${this.strike} dip: ${this.dip}`)
+        this.dip = 90 - dip
+        this.strike = zero_360(this.strike + 180)
+        //console.log(`dip > 90 strike: ${this.strike} dip: ${this.dip}`)
+    }
     this.sstrike = obj.strike * 1.0; // Show Strike
     this.sdip    = obj.dip * 1.0; // Show Strike
     this.type    = obj.type;
@@ -155,35 +166,35 @@ var Plane = function( obj ) {
         this.style.stroke(net)
         if(this.type == "plane") {
             net.great_circle(90 - this.dip);
-        } else { 
+        } else {
             net.great_circle(this.dip);
         }
         net.cx.restore();
     }
-    
+
     this.change_type = function() {
-	if(this.draw == this.plane_draw) {
-	    this.draw = this.pole_draw;
-	} else {
-	    this.draw = this.plane_draw;
-	}
+        if(this.draw == this.plane_draw) {
+            this.draw = this.pole_draw;
+        } else {
+            this.draw = this.plane_draw;
+        }
     }
     this.change_color = function(color) {
         this.style.color = color;
     }
     this.text = function() {
-        return( this.type + ' ' + 
-                this.strike + ' ' + 
-                this.dip + ' ' + 
+        return( this.type + ' ' +
+                this.strike + ' ' +
+                this.dip + ' ' +
                 this.style.text() );
     }
 
 
     if(this.type == "pole") {
-        this.draw  = this.pole_draw;    
+        this.draw  = this.pole_draw;
         this.sstrike += 90;
     } else {
-        this.draw = this.plane_draw;    
+        this.draw = this.plane_draw;
     }
     this.error = 0;
 }
@@ -192,7 +203,7 @@ function parsePlane(line) {
 
     var strike = dip = type = color = -1;
     var obj, error;
-    // Remove leading and trailing spaces 
+    // Remove leading and trailing spaces
     line = line.replace(/ +$/, "");
     line = line.replace(/^ +/, "");
 
@@ -200,7 +211,7 @@ function parsePlane(line) {
 
     // Split on Space(s)
     v = line.replace(/ +/, ' ').split(" ");
-    
+
     // Input must have 4 items (strike, dip, type, color)
     if(v.length == 4) {
         // Convert Strike to 0-360 Value after parsing
@@ -241,7 +252,7 @@ function parse_direction( s ) {
         if(i == -1) {
             i = s.length;
         }
-        var val = s.substr(0,i); // Grab Number 
+        var val = s.substr(0,i); // Grab Number
         var end = s.substr(i);   // Grab Letters at the end
         out = "(" + start + ") " + val + " (" + end + ")";
     }
@@ -254,10 +265,10 @@ function geo_direction_to_number( v ) {
     else if(v[0] == "" || v[2] == "") {  out = -1;          }
     else {
              if(v[0] == "N") {
-             if(v[2] == "E") {  out = 0.0   + v[1]*1.0;  }  
+             if(v[2] == "E") {  out = 0.0   + v[1]*1.0;  }
         else if(v[2] == "W") {  out = 360.0 - v[1]*1.0;  }
       } else if(v[0] == "S") {
-             if(v[2] == "E") {  out = 180.0 - v[1]*1.0;  } 
+             if(v[2] == "E") {  out = 180.0 - v[1]*1.0;  }
         else if(v[2] == "W") {  out = 180.0 + v[1]*1.0;  }
       }
     }
@@ -282,15 +293,15 @@ function dip_apply( s, d ) {
         return [to360(s), d[1] *1.0];
         break;
     case 'N':
-        if( (s1 > -45 && s1 < 45) || (s > 135 && s < 225 ) ) { return [-1,-1]; } 
+        if( (s1 > -45 && s1 < 45) || (s > 135 && s < 225 ) ) { return [-1,-1]; }
         if( s >= 225 && s <= 315 ) {
             s2 = s;
-        } 
+        }
         if( s >= 45 && s <= 135) {
             s2 = s + 180;
         }
         s2 = to360(s2);
-        return [s2, d[1] * 1.0]        
+        return [s2, d[1] * 1.0]
         break;
     case 'S':
         if( (s1 > -45 && s1 < 45) || (s > 135 && s < 225 ) ) { return [-1,-1]; }
@@ -329,4 +340,40 @@ function dip_apply( s, d ) {
         break;
     }
     return [-1,-1];
+}
+
+function zero_360(v) {
+    while(v < 0.0) {
+        v += 360.0
+    }
+    while(v > 360.0) {
+        v -= 360.0
+    }
+    return v
+}
+
+function cosd(v) {
+    return Math.cos(v * Math.PI / 180.0)
+}
+function sind(v) {
+    return Math.sin(v * Math.PI / 180.0)
+}
+function tand(v) {
+    return Math.tan(v * Math.PI / 180.0)
+}
+function asind(v) {
+    return Math.asin(v) * 180.0 / Math.PI
+}
+function atand(v) {
+    return Math.atan(v) * 180.0 / Math.PI
+}
+
+// T = S+b = S+(arctan(tanR*cosD))
+// P = arcsin(sinD*sinR)
+function Pitch(strike, dip, pitch, color) {
+    const beta = atand( tand(pitch) * cosd(dip))
+    const trend = strike + beta
+    const plunge = asind( sind(dip) * sind(pitch))
+    //console.log(strike, dip, pitch, trend, plunge)
+    return new Plane({"type": "pole", color, strike: trend, dip: plunge})
 }

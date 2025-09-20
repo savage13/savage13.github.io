@@ -14,52 +14,61 @@
 	<script language="dashpot.js" type="text/javascript" src="dashpot.js"></script>
   <style>
     .demo-container {
-    border: 0px solid red;
-	  box-sizing: border-box;
-  	width: 100%;
-	  height: 400px;
-	padding: 20px 15px 15px 15px;
-	margin: 15px auto 30px auto;
-}
+        border: 0px solid red;
+	      box-sizing: border-box;
+  	    width: 80vw;
+	      height: 30vw;
+	      padding: 20px 15px 15px 15px;
+	      margin: 15px auto 30px auto;
+    }
 
+    @media only screen and (max-width: 800px) {
+        .demo-container {
+            width: 95vw;
+	          height: 66vw;
+
+        }
+    }
+    
     #placeholder {
-     border: 0px solid red;
+        border: 0px solid red;
     }
     
     .demo-placeholder {
-	width: 100%;
-	height: 100%;
-	font-size: 14px;
-	line-height: 1.2em;
-}
+        border: 0px;
+	      width: 100%;
+	      height: 100%;
+	      font-size: 14px;
+	      line-height: 1.2em;
+    }
     #canvas {
-    border: 0px solid red;
+        border: 0px solid red;
     }
     .legend table {
-	  border-spacing: 5px;
-    font-size: 28px;
+	      border-spacing: 5px;
+        font-size: 28px;
     }
-.legend {
-    font-size: 1.05em;
-    background: #eeeeee;
-}
-.name {
-    display: inline-block;
-    width: 35%;
-    font-size: 1.0em;
-    font-weight: bold;
-    padding-left: 5pt;
-    padding-right: 5pt;
-}
-.value {
-    display: inline-block;
-    width: 15%;
-    font-size: 1.0em;
-    font-weight: bold;
-    padding-left: 5pt;
-    padding-right: 5pt;
-}
-
+    .legend {
+        font-size: 1.05em;
+        background: #eeeeee;
+    }
+    .name {
+        display: inline-block;
+        width: 35%;
+        font-size: 1.0em;
+        font-weight: bold;
+        padding-left: 5pt;
+        padding-right: 5pt;
+    }
+    .value {
+        display: inline-block;
+        width: 15%;
+        font-size: 1.0em;
+        font-weight: bold;
+        padding-left: 5pt;
+        padding-right: 5pt;
+    }
+    
   </style>
     </head>
   <body>
@@ -182,14 +191,28 @@
             </div>
             -->
           </td>
-
           <td width="50%">
-            <canvas id="canvas" width="400px" height="150px"></canvas>
+            <canvas class="dashpot" id="canvas" width=400 height=150></canvas>
           </td>
         </tr>
       </table>
     </center>
 
+    <style>
+      @media only screen and (min-width: 800px) {
+          .dashpot {
+              width: 400px;
+              height: 150px;
+          }
+      }
+      @media only screen and (max-width: 800px) {
+          .dashpot {
+              width: 200px;
+              height: 75px;
+          }
+      }
+      
+    </style>
 
     <a name="p02"/><h2>Problem 12.2</h2>
     Use the rheological modeling tool to gain an insight into how to incorporate the strain rate differences of silly putty.

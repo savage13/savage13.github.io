@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>Chapter 3</title>
+    <meta charset="utf-8" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.css" integrity="sha384-D+9gmBxUQogRLqvARvNLmA9hS2x//eK1FhVb9PiU86gmcrBrJAQT8okdJ4LMp2uv" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.js" integrity="sha384-483A6DwYfKeDa0Q52fJmxFXkcPCFfnXMoXblOkJ4JcA8zATN6Tm78UNL72AKk+0O" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/contrib/auto-render.min.js" integrity="sha384-yACMu8JWxKzSp/C1YV86pzGiQ/l1YUfE8oPuahJQxzehAjEt2GiQuy/BIvl9KyeF" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"
+            integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+            crossorigin="anonymous"></script>
+    <script src="stereonet.js"></script>
+    <script src="Plane.js"></script>
+    <script src="colornames.js"></script>
+    <script src="v4chp3.js" defer></script>
+    </head>
+  <body>
+    <a name="p01"/><h2>Problem 3.1</h2>
+    <b> Plotting a plane on a stereonet</b>
+    <p>
+      Assume the plane we would like to plot has an attitude of \( 126^\circ, 54^\circ SW \)
+    <p>
+      The strike is \( 126^\circ \) and the dip is \( 54^\circ SW \)
+    <p>
+      <ol>
+        <li>Plot strike on outer circle (primative circle)
+        <li>Rotate strike to North
+        <li>Count the dip in from the east (or west) and plot the point
+        <li>Draw Great circle from North to south through dip point
+        <li>Rotate back so north is north
+      </ol>
+    <p>
+      <a id="showp31" onclick="show_answer_p31()" href="javascript:void(0);">Show Me</a>
+      
+      
+      <canvas id="c31" width="300" height="300" class="net"></canvas>
+
+    
+      <a name="p02"/><h2>Problem 3.2</h2>
+      <b>Plotting a pole on a stereonet</b>
+    <p>
+      Assume the pole we could like to plot has an attitude of \( 255^\circ, 34^\circ \)
+    <p>
+      The trend is \( 255^\circ \) and the plunge is \( 34^\circ \)
+    <p>
+      <ol>
+        <li>Plot trend on the outer / primative circle
+        <li>Rotate trend to East-West line
+        <li>Count the plunge in from the outside, mark the point
+        <li>Rotate north back to north
+      </ol>
+    <p>
+      <a id="showp32" onclick="show_answer_p32()" href="javascript:void(0);">Show Me</a>
+    <p>
+      <canvas id="c32" width="300" height="300" class="net"></canvas>
+    </p>
+
+    <a name="p03"/><h2>Problem 3.3</h2>
+    <b>Plot the pole to the plane</b>
+
+    <p>
+
+      Plot the pole to the plane with an attitude of \(305^\circ, 72^\circ NE\)
+    <p>
+      The strike is \(305^\circ \) and the dip is \( 72^\circ NE\)
+    <p>
+      <ol>
+        <li>Plot strike on the outer / primative circle
+        <li>Rotate strike to North
+        <li>Count the dip in from the outside along the east west line, mark the point
+        <li>Optional: Draw the line of strike from the strike point through the dip point
+        <li>Count 90 degrees from the dip point along the east west line, mark the pole to the plane
+      </ol>
+    <p>
+      <a id="showp33" onclick="show_answer_p33()" href="javascript:void(0);">Show Me</a>
+    <p>
+      <canvas id="c33" width="300" height="300" class="net"></canvas>
+    </p>
+
+    <a name="p04"/><h2>Problem 3.4</h2>
+    <b>Determine the intersection between two planes</b>
+    <p>
+      Determine the intersection between \( 036^\circ, 32^\circ NW  \) and \(089^\circ, 80^\circ S \)
+    <p>
+      The strike of the first plane is \( 036^\circ \) and the dip is \( 32^\circ NW  \).
+      The strike of the second plane is  \(089^\circ \) and the dip is \( 80^\circ S \)
+    <p>
+      <ol>
+        <li style="color: red; font-weight: bold">First Plane
+        <li>Plot the first strike on the outer / primative circle
+        <li>Rotate first strike to North
+        <li>Count in by the first dip along the east west line, mark this dip point
+        <li>Draw the First Plane along the great circle going through the strike and dip points
+        <li>Rotate back to North
+
+        <li style="color: blue; font-weight: bold">Second Plane
+        <li>Plot the second strike on the outer / primative circle
+        <li>Rotate second strike to North
+        <li>Count in by the second dip along the east west line, mark this dip point
+        <li>Draw the Second Plane along the great circle going through the strike and dip points
+        <li>Rotate back to North
+        <li style="color: fuchsia; font-weight: bold">Intersection
+        <li>The intersection of the two lines is the intersection of the planes, it is a line, but is plotted as a point on the stereonet
+        <li>Mark the intersection
+        <li>Rotate the intersection point to the East West line
+        <li>Mark the outer / primative circle along the East West line, this will be the trend (don't read it yet)
+        <li>Count in to find the plunge of the intersection
+        <li>Rotate back to north
+        <li>Read the value of the intersection's trend that you marked on the outer / primative circel
+          
+      </ol>
+    <p>
+      <a id="showp34" onclick="show_answer_p34()" href="javascript:void(0);">Show Me</a>
+    <p>
+      <canvas id="c34" width="300" height="300" class="net"></canvas>
+    </p>
+
+
+    <a name="p05"/><h2>Problem 3.5</h2>
+    <b>Plot a plane with a pitch </b>
+
+    <p>
+      Plot the plane \(165^\circ, 50^\circ E\) and a fault slip motion (pitch or rake) of \( 45^\circ \)
+    <p>
+      <ol>
+        <li style="color: black; font-weight: bold">Plot Plane
+        <li>Plot the strike on the outer / primative circle
+        <li>Rotate strike to North
+        <li>Count in by the dip along the east west line, mark this dip point
+        <li>Draw the Plane along the great circle going through the strike and dip points
+        <li>Rotate back to North
+        <li style="color: red; font-weight: bold">Plot Pitch
+        <li>Rotate Plane's strike to North
+        <li>From North, count down the small circle along the plane the amount of the pitch, mark the pitch point
+        <li style="color: red; font-weight: bold">Measure Pitch
+        <li>Rotate the Pitch point to the East West Line
+        <li>Mark the outer / primative circle along the East West line, this will be the trend (don't read it yet)
+        <li>Count in to find the plunge of the pitch
+        <li>Rotate north back to north
+        <li>Read the value of the pitch's trend that you marked on the outer / primative circel
+
+      </ol>
+    <p>
+      <a id="showp35" onclick="show_answer_p35()" href="javascript:void(0);">Show Me</a>
+    <p>
+      <canvas id="c35" width="300" height="300" class="net"></canvas>
+    </p>
+
+
+</html>
