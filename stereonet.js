@@ -6,70 +6,104 @@ function debugc(str) {
     debug(str);
 }
 
+function $(x) { return document.querySelector(x); }
 
-function Stereonet(id) {
+class Stereonet extends EventTarget {
 
-    this.canvas = $(id)[0];
+    constructor(id) {
+        super()
+        this.canvas = $(id);
 
-    if(!this.canvas) {
-        alert(`Error: stereonet cannot find canvas id: ${id}`);
-        console.log(document.querySelector(id), id)
-        return;
+        if(!this.canvas) {
+            alert(`Error: stereonet cannot find canvas id: ${id}`);
+            console.log(document.querySelector(id), id)
+            return;
+        }
+
+        if(!this.canvas.getContext) {
+            alert("Error: stereonet cannot find canvas.getContext");
+            return;
+        }
+
+        this.cx = this.canvas.getContext("2d");
+        if(!this.cx) {
+            alert("Error: stereonet failed to getContext");
+            return;
+        }
+
+        // Lengths
+        this.x0     = -this.canvas.width/2.0;
+        this.y0     = -this.canvas.height/2.0;
+        this.width  =  this.canvas.width;
+        this.height =  this.canvas.height;
+        this.radius = (this.width/2.0) * 0.8;
+
+        // Translate the canvas to put the middle at (0, 0)
+        this.cx.translate(this.width/2.0, this.height/2.0);
+
+        this.objects = new Array();
+        this.last_id     = 0;
+
+        this.EQUAL_AREA  = 0;
+        this.EQUAL_ANGLE = 1;
+        this.projection_type = this.EQUAL_AREA;
+
+        // These are setup for a good looking stereonet
+        this.segments          = 17;
+        this.reference_spacing = 10;
+        this.reference_width   = 0.5;
+        this.reference_color   = 'rgba(0,0,0,0.5)';
+        this.show_original_net = 1;
+
+        this.pole_size  = 5;
+        this.plane_width = 2;
+
+        // Set the default to an Equal Area Net
+        this.project = this.equal_area
+        this.inverse = this.equal_area_inverse
+
+        // Movement
+        this.mouse_add = false;
+        this.angle = 0.0;
+        this.angle_start = 0.;
+
+        //net = this;
+
+        $(id).addEventListener('mousedown', (ev) => {  this.mousedown(ev); });
+        $(id).addEventListener('mousemove', (ev) => { this.mousemove(ev); });
+        $(id).addEventListener('mouseup', (ev) => { this.mouseup(ev);   });
+
+        this.update();
+
     }
-    if(!this.canvas.getContext) {
-        alert("Error: stereonet cannot find canvas.getContext");
-        return;
+    on(type, listener, options = {}) {
+        this.addEventListener(type, listener, options)
     }
-
-    this.cx = this.canvas.getContext("2d");
-    if(!this.cx) {
-        alert("Error: stereonet failed to getContext");
-        return;
-    }
-
-    // Lengths
-    this.x0     = -this.canvas.width/2.0;
-    this.y0     = -this.canvas.height/2.0;
-    this.width  =  this.canvas.width;
-    this.height =  this.canvas.height;
-    this.radius = (this.width/2.0) * 0.8;
-
-    // Translate the canvas to put the middle at (0, 0)
-    this.cx.translate(this.width/2.0, this.height/2.0);
-
-    this.objects = new Array();
-    this.last_id     = 0;
-
-    this.equal_area  = 0;
-    this.equal_angle = 1;
-    this.projection_type = this.equal_area;
-
-    // These are setup for a good looking stereonet
-    this.segments          = 17;
-    this.reference_spacing = 10;
-    this.reference_width   = 0.5;
-    this.reference_color   = 'rgba(0,0,0,0.5)';
-    this.show_original_net = 1;
-
-    this.pole_size  = 5;
-    this.plane_width = 2;
 
     // Functions
-    this.clear = function() {
+    clear() {
         this.cx.clearRect(this.x0, this.y0, this.width, this.height);
         this.cx.fillStyle = "#FFFFFF";
         this.cx.fillRect(this.x0, this.y0, this.width, this.height);
         this.cx.fill();
     }
 
+    reset() {
+        this.angle = 0
+        this.remove_all()
+        this.update()
+    }
+    
+
     // Rotate the Steroenet and redraw
-    this.rotate = function(angle) {
+    rotate(angle) {
         //angle_show(angle);
         this.angle = angle;
         this.update();
+        this.dispatchEvent(new CustomEvent('angle', { detail: { angle: this.angle * 180 / Math.PI } }))
     }
 
-    this.save = function(id) {
+    save(id) {
         var dataurl = this.canvas.toDataURL();
         $(id).prepend('<img width="100%" src="' + dataurl + '"/> <hr/>');
         for(var pid in this.objects) {
@@ -80,7 +114,7 @@ function Stereonet(id) {
     }
 
     // Draw the reference ticks
-    this.ticks = function() {
+    ticks() {
         for(var i = 0; i < 4; i++) {
             this.cx.save();
             this.cx.rotate(i * Math.PI/2);
@@ -93,7 +127,7 @@ function Stereonet(id) {
     }
 
     // Compute an Equal Area Net
-    this.equal_area = function(lat, lon) {
+    equal_area(lat, lon) {
         var x, y, z;
         lat = lat * Math.PI / 180.0;
         lon = lon * Math.PI / 180.0;
@@ -103,7 +137,7 @@ function Stereonet(id) {
         return { x: x, y: y };
     }
 
-    this.equal_area_inverse = function(r,ang) {
+    equal_area_inverse(r,ang) {
         var mstrike = ( ang * 180.0/Math.PI ) + 90.0;
         var r = this.mouse_radius / this.radius;
         var mdip = 1 - (r * r) ;
@@ -112,7 +146,7 @@ function Stereonet(id) {
     }
 
     // Compute an Equal Angle Net
-    this.equal_angle = function(lat, lon) {
+    equal_angle(lat, lon) {
         var x, y, z;
         lat = lat * Math.PI / 180.0;
         lon = lon * Math.PI / 180.0;
@@ -122,7 +156,7 @@ function Stereonet(id) {
         return { x: x, y: y };
     }
 
-    this.equal_angle_inverse = function(r,ang) {
+    equal_angle_inverse(r,ang) {
         var mstrike = ( ang * 180.0/Math.PI ) + 90.0;
         var r = this.mouse_radius / this.radius;
         var mdip = (Math.atan(r) * 2.0) * 180.0 / Math.PI;
@@ -130,12 +164,9 @@ function Stereonet(id) {
     }
 
 
-    // Set the default to an Equal Area NEt
-    this.project = this.equal_area;
-    this.inverse = this.equal_area_inverse;
 
     // Draw a small circle
-    this.small_circle = function (lat) {
+    small_circle(lat) {
         var z;
         this.cx.save();
         this.cx.beginPath();
@@ -151,7 +182,7 @@ function Stereonet(id) {
     }
 
     // Draw a great cicle
-    this.great_circle = function(lon) {
+    great_circle(lon) {
         var xi, yi;
         this.cx.save();
         this.cx.beginPath();
@@ -168,7 +199,7 @@ function Stereonet(id) {
 
 
     // Draw the small and great circle refernce lines
-    this.reference_lines = function() {
+    reference_lines() {
         for(var i = -90.0; i <= 90.0; i += this.reference_spacing) {
             this.great_circle(i);
             this.small_circle(i);
@@ -176,7 +207,7 @@ function Stereonet(id) {
     }
 
     // Draw a Circle
-    this.circle = function() {
+    circle() {
         this.cx.save();
         this.cx.moveTo(0, 0);
         this.cx.beginPath();
@@ -187,7 +218,7 @@ function Stereonet(id) {
         this.cx.restore();
     }
 
-    this.north_tick = function() {
+    north_tick() {
         this.cx.lineWidth = 1.5;
         this.cx.moveTo(0, -this.radius);
         this.cx.lineTo(0, -this.radius - 20);
@@ -196,7 +227,7 @@ function Stereonet(id) {
     }
 
     // Draw the reference lines an the northern marker
-    this.reference_draw  = function() {
+    reference_draw() {
         this.cx.lineWidth = this.reference_width;
         this.circle();
         this.ticks();
@@ -206,7 +237,7 @@ function Stereonet(id) {
     }
 
     // Drawing Function
-    this.update = function() {
+    update() {
         this.clear();
         if(this.show_original_net) {
             this.reference_draw();
@@ -218,24 +249,20 @@ function Stereonet(id) {
         this.cx.restore();
     }
 
-    this.objects_draw = function() {
+    objects_draw() {
         for(var i in this.objects) {
             this.objects[i].draw(this);
         }
     }
 
-    this.range = function(x, min_value, max_value) {
+    range(x, min_value, max_value) {
         var dr = max_value - min_value;
         while(x >= max_value) { x -= dr; }
         while(x < min_value) { x += dr; }
         return x;
     }
 
-    // Movement
-    this.mouse_add = false;
-    this.angle = 0.0;
-    this.angle_start = 0.;
-    this.mouse_position = function(e) {
+    mouse_position(e) {
         var rect = this.canvas.getBoundingClientRect();
         this.mouse_x = e.pageX - rect.left + this.x0;
         this.mouse_y = e.pageY - rect.top + this.y0 ;
@@ -244,7 +271,7 @@ function Stereonet(id) {
         this.mouse_radius = Math.sqrt( (this.mouse_x * this.mouse_x) +
                                        (this.mouse_y * this.mouse_y) );
     }
-    this.mousedown = function(ev) {
+    mousedown(ev) {
         this.mouse_position(ev);
         if(this.mouse_add == false) {
             this.drag_started = true;
@@ -262,7 +289,7 @@ function Stereonet(id) {
                         dip:    z.dip.toFixed(2)} );
         }
     }
-    this.mousemove = function(ev) {
+    mousemove(ev) {
         if(this.drag_started) {
             this.mouse_position(ev);
             this.rotate(this.angle_start +
@@ -274,31 +301,26 @@ function Stereonet(id) {
             }
             var z =  this.inverse(this.mouse_radius, this.mouse_angle);
             z.strike = this.range(z.strike, 0, 360);
-
-            $("#mouse").html( 'Strike: ' + z.strike.toFixed(2) + ' ' +
+            const m = $('#mouse')
+            if(m) {
+                m.innerHTML =  'Strike: ' + z.strike.toFixed(2) + ' ' +
                               'Dip: ' + z.dip.toFixed(2) +
                               " (" + this.mouse_x  + ", " +
-                              this.mouse_y + ")" );
+                    this.mouse_y + ")" ;
+            }
 
         }
     }
-    this.mouseup = function(ev) {
+    mouseup(ev) {
         if(this.drag_started) {
             this.mousemove(ev);
             this.drag_started = false;
         }
     }
 
-    net = this;
 
-    $(id).mousedown( function(ev) { net.mousedown(ev); });
-    $(id).mousemove( function(ev) { net.mousemove(ev); });
-    $(id).mouseup( function(ev)   { net.mouseup(ev);   });
-
-    // Modification Functions
-
-    this.change_projection_type = function() {
-        if(this.project == this.equal_area) {
+    change_projection_type() {
+        if(this.project == this.EQUAL_AREA) {
             this.project = this.equal_angle;
             this.inverse = this.equal_angle_inverse;
         } else {
@@ -308,14 +330,14 @@ function Stereonet(id) {
         this.update();
     }
 
-    this.change_color = function(id, color) {
+    change_color(id, color) {
         if(this.objects[id]) {
             this.objects[id].change_color(color);
             this.update();
         }
     }
 
-    this.change_property = function(width, spacing, pole_size,
+    change_property(width, spacing, pole_size,
                                     plane_width, show_net) {
         this.reference_width   = width;
         this.reference_spacing = spacing;
@@ -325,7 +347,7 @@ function Stereonet(id) {
         this.update();
     }
 
-    this.small_circle_add = function( color, angle, rotation ) {
+    small_circle_add( color, angle, rotation ) {
         if(rotation == undefined) {
             rotation = -this.angle * 180.0 / Math.PI;
             rotation = rotation.toFixed(2) * 1.0;
@@ -339,7 +361,7 @@ function Stereonet(id) {
     }
 
 
-    this.small_circles_draw = function() {
+    small_circles_draw() {
         this.cx.save();
         this.cx.lineWidth = 2;
         for( var id in this.small_circles ) {
@@ -353,7 +375,7 @@ function Stereonet(id) {
         this.cx.restore();
     }
 
-    this.add = function( obj ) {
+    add( obj ) {
         if(obj == undefined) {
             return obj;
         }
@@ -363,27 +385,27 @@ function Stereonet(id) {
         this.update();
         return n;
     }
-    this.remove_all = function() {
+    remove_all() {
         for(const id of Object.keys(this.objects)) {
             delete this.objects[id];
         }
         this.update();
 
     }
-    this.remove = function(id) {
+    remove(id) {
         if(this.objects[id]) {
             delete this.objects[id];
         }
         this.update();
     }
-    this.change_plane_type = function(id) {
+    change_plane_type(id) {
         if(this.objects[id]) {
             this.objects[id].change_type();
         }
         this.update();
     }
 
-    this.overlapping_circles = function(  ) {
+    overlapping_circles() {
         var z = new Array(this.width*this.height);
         for(var i = 0; i < z.length; i++) {
             z[i] = 0;
@@ -422,7 +444,7 @@ function Stereonet(id) {
         return ({ 'data': z, 'max': zmax });
     }
 
-    this.moving_circles = function () {
+    moving_circles () {
         var z = new Array(this.width*this.height);
         for(var i = 0; i < z.length; i++) {
             z[i] = 0;
@@ -452,7 +474,7 @@ function Stereonet(id) {
         return ({ 'data': z, 'max': zmax });
     }
 
-    this.contour = function() {
+    contour() {
         var img;
         if(this.cx.getImageData) {
             img = this.cx.getImageData(0,0,this.width, this.height);
@@ -489,5 +511,4 @@ function Stereonet(id) {
     }
 
 
-    this.update();
 }

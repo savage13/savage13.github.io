@@ -2,7 +2,7 @@
 function rot_animate(can, angle, duration) {
     var start = null;
     var a0 = can.angle * 180.0 / Math.PI;
-    
+
     function rot(timestamp) {
         if (!start) {
             start = timestamp;

@@ -1,0 +1,479 @@
+<div id="wrap">
+  <div id="left">
+    <div style="margin-bottom: 1em;">
+      <button id="run">Run</button>
+      <button id="step">Step</button>
+      <select id="examples" style="margin-left:10em;">
+        <option value="plot_plane">Plot plane</option>
+        <option value="plot_pole">Plot plane</option>
+        <option value="plot_pole_to_plane">Plot pole to plane</option>
+        <option value="plane_intersection">Find plane intersection</option>
+        <option value="plane_pitch">Plot pitch on plane</option>
+      </select>
+      <button id="Load">Load</button>
+    </div>
+    <div id="input"></div>
+  </div>
+  <canvas id="c" width="300" height="300" style="border: 0;"></canvas>
+</div>
+<style>
+  #wrap {
+      position: relative;
+      display: flex;
+      flex-flow: row nowrap;
+      width: 100%;
+      height: 100%;
+  }
+  #left {
+      display: flex;
+      flex-flow: column nowrap;
+      height: 100%;
+  }
+  textarea {
+      flex-grow: 2;
+  }
+  #input {
+    position: relative;
+    width: 500px;
+    height: 100%;
+  }
+  .ace_gutter-cell.ace_breakpoint {
+      color: black;
+      background-color: rgba(120,255,120);
+      font-weight: bold;
+  }
+</style>
+<script src="https://unpkg.com/ace-builds@1.43.3/src-noconflict/ace.js"></script>
+
+<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+<script src="stereonet.js"></script>
+<script src="Plane.js"></script>
+<script src="colornames.js"></script>
+<script src="commands.js"></script>
+
+<script defer type="module">
+  import {parse} from './math.js'
+  async function rot_animate(can, angle, duration) {
+      let start = undefined
+      let a0 = can.angle * 180.0 / Math.PI
+      let request_id = null
+
+      return new Promise(resolve => {
+          function rot(timestamp) {
+              if (start === undefined) {
+                  start = timestamp;
+              }
+              var progress = Math.min((timestamp - start) / duration, 1.0)
+              can.rotate((a0 + angle * progress) * Math.PI/180.0);
+              if(progress < 1) {
+                  request_id = requestAnimationFrame(rot);
+              } else {
+                  cancelAnimationFrame(request_id)
+                  resolve()
+              }
+          }
+          request_id = requestAnimationFrame(rot);
+      })
+  }
+
+  async function pole_animate(can, strike, dip0, dip1, opts = {}) {
+      let color = opts.color || "black"
+      let delay = opts.delay || 500
+      let id = null
+      //console.log("pole animate", opts, color)
+      let start = undefined
+      let dip = dip0
+      let request_id = null;
+      let dsdt = Math.abs(dip1 - dip0) / delay
+      return new Promise(resolve => {
+          function dotty(timestamp) {
+              if(start === undefined) {
+                  start = timestamp
+              }
+              if(id !== null) {
+                  can.remove(id)
+              }
+              id = can.add(new Plane({type: "pole", color, strike, dip}))
+              if(dip == dip1) {
+                  cancelAnimationFrame(request_id)
+                  resolve()
+              } else {
+                  if(dip0 < dip1) { // Increasing dip
+                      if(dip < dip1) {
+                          dip = Math.min(dip0 + dsdt * (timestamp-start), dip1)
+                      }
+                  } else {
+                      if(dip > dip1) { // Decreasing dip
+                          dip = Math.max(dip0 - dsdt * (timestamp-start), dip1)
+                      }
+                  }
+                  request_id = requestAnimationFrame(dotty)
+              }
+          }
+          request_id = requestAnimationFrame(dotty)
+      })
+  }
+
+  
+  async function pitch_animate(can, strike, dip, pitch0, pitch1, opts = {}) {
+      let color = opts.color || "black"
+      let delay = opts.delay || 500
+      let id = null
+      let start = undefined
+      let pitch = pitch0
+      let request_id = null;
+      console.log("pitch animate", strike, dip, pitch0, pitch1)
+      let dsdt = Math.abs(pitch1 - pitch0) / delay
+      return new Promise(resolve => {
+          function dotty(timestamp) {
+              if(start === undefined) {
+                  start = timestamp
+              }
+              if(id !== null) {
+                  can.remove(id)
+              }
+              id = can.add(Pitch(strike, dip, pitch, color))
+              if(pitch == pitch1) {
+                  cancelAnimationFrame(request_id)
+                  resolve()
+              } else {
+                  if(pitch0 < pitch1) { // Increasing dip
+                      if(pitch < pitch1) {
+                          pitch = Math.min(pitch0 + dsdt * (timestamp-start), pitch1)
+                      }
+                  } else {
+                      if(pitch > pitch1) { // Decreasing dip
+                          pitch = Math.max(pitch0 - dsdt * (timestamp-start), pitch1)
+                      }
+                  }
+                  request_id = requestAnimationFrame(dotty)
+              }
+          }
+          request_id = requestAnimationFrame(dotty)
+      })
+  }
+
+  const c = new Stereonet("#c")
+
+  let speed = 1
+
+  const examples = {
+      plot_plane: `
+delay 0.2
+color red
+
+# Draw Plane strike and dip
+
+let strike = 45
+let dip = 43
+let normal = 135
+
+# Mark primative circle
+pole strike 0
+
+# Rotate to North
+rotate -strike
+
+# Count dip along east-west line
+pole (strike + 90) 0:dip
+
+# Draw plane through poles
+plane strike dip
+
+# Rotate back to north
+rotate strike
+`,
+      plot_pole: `
+delay 0.2
+color red
+
+# Define the pole
+let trend = 60
+let plunge = 35
+
+# Plot trend on primative circle
+pole trend 0
+
+# Rotate to East (90 degrees)
+rotate (90-trend)
+
+# Count plunge in along East-West line
+pole trend 0:plunge
+
+# Rotate back to original position
+rotate -(90 - trend)
+`,
+      plot_pole_to_plane: `
+delay 0.2
+color red
+
+# Define the plane
+let strike = 45
+let dip = 43
+
+# Plot strike on primative circle (dip = 0)
+pole strike 0
+
+# Rotate strike to north
+rotate -strike
+
+# Count dip in along east west line
+pole (strike+90) 0:dip
+
+# Draw the plane using the known values
+plane strike dip
+
+# Count 90 degrees from the true dip to get the pole
+#   to the plane
+color green
+pole (strike+90) dip:(dip+90)
+
+# Rotate back to the original position
+rotate strike
+`,
+  plane_intersection: `
+delay 0.3
+
+# Define Plane 1
+let strike1 = 45
+let dip1 = 20
+
+# Define Plane 2
+let strike2 = -70
+let dip2 = 65
+
+let trend = 102
+let plunge = 17
+
+# Plot Plane 1 (see plot plane)
+color red
+pole strike1 0
+rotate -strike1
+pole (strike1 + 90) 0:dip1
+plane strike1 dip1
+rotate strike1
+
+# Plot Plane 2 (see plot plane)
+color blue
+pole strike2 0
+rotate -strike2
+pole (strike2 + 90) 0:dip2
+plane strike2 dip2
+rotate strike2
+
+color fuchsia
+pole trend plunge
+rotate (90 - trend)
+pole trend 0
+pole trend 0:plunge
+rotate -(90 - trend)
+`,
+
+  plane_pitch: `
+delay 0.2
+color red
+
+let strike = 20
+let dip = 70
+let pitch = 64
+
+let pitch_trend = 55
+let pitch_plunge = 57
+
+# Plot the Plane (see plot_plane)
+pole strike 0
+rotate -strike
+pole (strike+90) 0:dip
+plane strike dip
+rotate strike
+
+# Find the pitch
+color orange
+# Rotate plane to North
+rotate -strike
+delay 0.5
+# Count pitch along the plane using small circles
+pitch strike dip 0:pitch
+# Rotate back to the orignal value
+rotate strike
+
+# Measure the orientation of the pitch in the plane
+color green
+delay 0.3
+# Rotate pitch to east-west line
+rotate (90 - pitch_trend)
+
+# Mark trend of pitch on outside circle
+pole pitch_trend 0
+
+# Count in plunge along east-west line
+pole pitch_trend 0:pitch_plunge
+
+# Rotate back to original position and 
+#    measure the trend of the pitch
+rotate -(90 - pitch_trend)
+`
+  }
+  
+  async function run() {
+      let out = commands(plane_pitch)
+      run_commands(out)
+  }
+  async function run_commands(out) {
+      c.reset()
+      for(let i = 0; i < out.length; i++) {
+          const line = out[i]
+          console.log(i, line)
+          await run_one(i, line)
+      }
+      editor.getSession().clearBreakpoints()
+  }
+  async function run_one(i, line) {
+      console.log(i, line)
+      editor.getSession().clearBreakpoints()
+      editor.getSession().setBreakpoint(i)
+      if(line.type == "plane" || line.type == "pole") {
+          const id = new Plane(line)
+          id.change_color( color )
+          c.add(id)
+      } else if(line.type == "rotate") {
+          await rot_animate(c, line.angle, delay / speed)
+      } else if(line.type == "pole_animate_dip") {
+          await pole_animate(c, line.strike, line.dip[0], line.dip[1], {
+              color, delay: delay / speed
+          })
+      } else if(line.type == "pole_animate_pitch") {
+          await pitch_animate(c, line.strike, line.dip, line.pitch[0], line.pitch[1], {
+              color, delay: delay / speed
+          })
+      } else if(line.type == "color") {
+          color = line.color
+          return
+      } else if(line.type == "delay") {
+          delay = line.delay * 1000
+          return
+      } else if(line.type == "let") {
+          return
+      } else if(line.type == "empty") {
+          return
+      }
+      await sleep(delay / speed)
+  }
+  //run()
+  let delay = 200
+  let color = "black"
+  let comms = []
+  let current_line = 0
+
+  function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  let mem = {}
+  $('#run').addEventListener('click', (ev) => {
+      let input = editor.getSession().getValue()
+      mem = {}
+      let out = input.split("\n").map(v => parse(v, mem))
+      console.log(out)
+      run_commands(out)
+      current_line = 0
+  })
+  $('#step').addEventListener('click', (ev) => {
+      if(current_line == 0) {
+          c.remove_all()
+      }
+      if(current_line >= comms.length) {
+          current_line = 0
+          return
+      }
+      run_one(current_line + 1, comms[current_line])
+      current_line += 1
+      if(current_line >= comms.length) {
+          current_line = 0
+      }
+  })
+  let editor = ace.edit("input");
+
+  editor.getSession().on('change', (ev) => {
+      let txt = editor.getSession().getValue()
+      localStorage.setItem('editor', txt)
+      mem = {}
+      try {
+          comms = txt.split("\n").map(v => parse(v, mem))
+      } catch (e ) {
+          console.log(e)
+      }
+  })
+
+  ace.define('ace/mode/example', function(require, exports, module) {
+
+      var oop = require("ace/lib/oop");
+      var TextMode = require("ace/mode/text").Mode;
+      var ExampleHighlightRules = require("ace/mode/example_highlight_rules").ExampleHighlightRules;
+
+      var Mode = function() {
+          this.HighlightRules = ExampleHighlightRules;
+      };
+      oop.inherits(Mode, TextMode);
+
+      (function() {
+          // Extra logic goes here. (see below)
+      }).call(Mode.prototype);
+
+      exports.Mode = Mode;
+  });
+
+  ace.define('ace/mode/example_highlight_rules', function(require, exports, module) {
+      var oop = require("ace/lib/oop");
+      var TextHighlightRules = require("ace/mode/text_highlight_rules").TextHighlightRules;
+      var ExampleHighlightRules = function() {
+          this.$rules = new TextHighlightRules().getRules();
+          var newRules = {
+              start: [
+                  {
+                      token: "keyword.other",
+                      regex: "rotate"
+                  },
+                  {
+                      token: "keyword.control",
+                      regex: "plane|pole",
+                  },
+                  {
+                      token: "markup",
+                      regex: "delay|color|let"
+                  },
+                  {
+                      token: "constant.numeric",
+                      regex: "[+-]?([0-9]*[.])?[0-9]+",
+                  },
+                  {
+                      token: "variable",
+                      regex: "[a-z_][a-zA-Z_]*"
+                  },
+                  {
+                      token: "comment",
+                      regex: "^#.+$",
+                  }
+              ]
+          }
+          this.addRules(newRules, "");
+          console.log(this.$rules)
+      }
+      oop.inherits(ExampleHighlightRules, TextHighlightRules);
+      exports.ExampleHighlightRules = ExampleHighlightRules;
+  });
+
+
+  let rv = editor.getSession().setMode('ace/mode/example')
+
+  let txt = localStorage.getItem("editor") || ""
+  editor.getSession().setValue(txt)
+  comms = txt.split("\n").map(v => parse(v, mem))
+
+    $('#load').addEventListener('click', (ev) => {
+        let v = $('#examples').value
+        
+        editor.getSession().setValue(examples[v])
+    })
+    
+</script>
