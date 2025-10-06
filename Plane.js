@@ -28,11 +28,11 @@ var Style = function(obj) {
     this.color   = obj.color;
 
     this.stroke = function(net) {
-        net.cx.strokeStyle = "#" + colorNameToHex(this.color);
+        net.cx.strokeStyle = colorNameToHex(this.color);
         net.cx.lineWidth   = this.width;
     }
     this.fill = function(net) {
-        net.cx.fillStyle   = "#" + colorNameToHex(this.color);
+        net.cx.fillStyle   = colorNameToHex(this.color);
     }
     this.text = function() {
         return this.color;

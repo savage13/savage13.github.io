@@ -85,7 +85,7 @@ function statement(s) {
                 return err(`expected 'let name = value', got '${s.line}' missing value`)
             }
             s.mem[names[0]] = value
-            return {type: "let", name, value }
+            return {type: "let", name: names[0], value }
         }
         // check for functions returning two values
         if(s.next("intersect")) {
@@ -126,13 +126,85 @@ function statement(s) {
             if(pitch === undefined)
                 return err(`expected 'pitchpole strike dip pitch', got '${s.line}', no pitch`)
             let pole = pitch_pole(strike, dip, pitch)
-            console.log('pitch pole', strike, dip, pitch, pole)
+            //console.log('pitch pole', strike, dip, pitch, pole)
             if(pole == undefined)
                 return err(`expected 'pitchpole strike dip pitch', got '${s.line}', error computing pole`)
             let values = pole
             s.mem[names[0]] = pole.trend
             s.mem[names[1]] = pole.plunge
             return {type: "let", names, values }
+        }
+        if(s.next("normal")) {
+            s.adv(6)
+            if(!isspace(s.c())) {
+                return err(`expected 'pitchpole strike dip pitch', got '${s.line}', no space pitchpole`)
+            }
+            let strike1 = factor(s)
+            if(strike1 === undefined)
+                return err(`expected 'pitchpole strike dip pitch', got '${s.line}', no strike`)
+            let dip1 = factor(s)
+            if(dip1 === undefined)
+                return err(`expected 'pitchpole strike dip pitch', got '${s.line}', no dip`)
+            let pole = pole_to_plane(strike1, dip1)
+            let values = pole
+            s.mem[names[0]] = pole.trend
+            s.mem[names[1]] = pole.plunge
+            return {type: "let", names, values}
+        }
+        if(s.next("midpoint")) {
+            console.log("midpoint")
+            s.adv(8)
+            if(!isspace(s.c())) {
+                return err(`expected 'pitchpole strike dip pitch', got '${s.line}', no space pitchpole`)
+            }
+            let trend1 = factor(s)
+            if(trend1 === undefined)
+                return err(`expected 'pitchpole strike dip pitch', got '${s.line}', no strike`)
+            let plunge1 = factor(s)
+            if(plunge1 === undefined)
+                return err(`expected 'pitchpole strike dip pitch', got '${s.line}', no dip`)
+            let trend2 = factor(s)
+            if(trend2 === undefined)
+                return err(`expected 'pitchpole strike dip pitch', got '${s.line}', no pitch`)
+            let plunge2 = factor(s)
+            if(plunge2 === undefined)
+                return err(`expected 'pitchpole strike dip pitch', got '${s.line}', no pitch`)
+            console.log(trend1, plunge2, trend2, plunge2)
+            let pole = average_pole(trend1, plunge1, trend2, plunge2)
+            if(pole == undefined)
+                return err(`expected 'pitchpole strike dip pitch', got '${s.line}', error computing pole`)
+            let values = pole
+            console.log("pole", pole)
+            s.mem[names[0]] = pole.trend
+            s.mem[names[1]] = pole.plunge
+            return {type: "let", names, values}
+        }
+        if(s.next("poles_to_plane")) {
+            console.log("poles_to_plane")
+            s.adv(14)
+            if(!isspace(s.c())) {
+                return err(`expected 'pitchpole strike dip pitch', got '${s.line}', no space pitchpole`)
+            }
+            let trend1 = factor(s)
+            if(trend1 === undefined)
+                return err(`expected 'pitchpole strike dip pitch', got '${s.line}', no strike`)
+            let plunge1 = factor(s)
+            if(plunge1 === undefined)
+                return err(`expected 'pitchpole strike dip pitch', got '${s.line}', no dip`)
+            let trend2 = factor(s)
+            if(trend2 === undefined)
+                return err(`expected 'pitchpole strike dip pitch', got '${s.line}', no pitch`)
+            let plunge2 = factor(s)
+            if(plunge2 === undefined)
+                return err(`expected 'pitchpole strike dip pitch', got '${s.line}', no pitch`)
+            console.log(trend1, plunge2, trend2, plunge2)
+            let pole = two_poles_to_plane(trend1, plunge1, trend2, plunge2)
+            if(pole == undefined)
+                return err(`expected 'pitchpole strike dip pitch', got '${s.line}', error computing pole`)
+            let values = pole
+            s.mem[names[0]] = pole.strike
+            s.mem[names[1]] = pole.dip
+            return {type: "let", names, values}
         }
         return err(`exptected function returning muliple values, got '${s.line}': intersect`)
     } else if(s.next("pole")) {
@@ -288,27 +360,28 @@ function expression(s) {
         return undefined
     }
     a = a * scale
-    space(s)
-    if(s.c() != "+" && s.c() != "-") {
-        return a
-    }
-    let op = s.c()
-    s.adv()
-    //console.log('expr(op)', op)
-    space(s)
-    let b = term(s)
-    //console.log('expr(b)', b)
-    if(b === undefined) {
-        console.log(`expected 'expression', got ${s.line}, unknown 2nd term`)
-        return undefined
-    }
-    if(op == "+") {
-        //console.log("expr(a+b)", a, b)
-        return a + b
-    }
-    if(op == "-") {
-        //console.log("expr(a-b)", a, b)
-        return a - b
+    while(true) {
+        space(s)
+        if(s.c() != "+" && s.c() != "-") {
+            return a
+        }
+        let op = s.c()
+        s.adv()
+        //console.log('expr(op)', op)
+        space(s)
+        let b = term(s)
+        //console.log('expr(b)', b)
+        if(b === undefined) {
+            console.log(`expected 'expression', got ${s.line}, unknown 2nd term`)
+            return undefined
+        }
+        if(op == "+") {
+            //console.log("expr(a+b)", a, b)
+            a = a + b
+        } else if(op == "-") {
+            //console.log("expr(a-b)", a, b)
+            a = a - b
+        }
     }
     return undefined
 }
@@ -321,26 +394,29 @@ function term(s) {
         console.log(`expected 'term', got ${s.line}, unknown 1st factor`)
         return undefined
     }
-    space(s)
-    if(s.c() != "*" && s.c != "/") {
-        return a
-    }
-    let op = s.c()
-    s.adv()
+    while(true) {
+        space(s)
+        //console.log(s.c())
+        if(s.c() != "*" && s.c() != "/") {
+            return a
+        }
+        let op = s.c()
+        s.adv()
 
-    space(s)
-    let b = factor(s)
-    //console.log('term(b)', b)
-    if(b === undefined) {
-        console.log(`expected 'term', got ${s.line}, unknown 2nd factor`)
-        return undefined
-    }
-
-    if(op == "*") {
-        return a * b
-    }
-    if(op == "/") {
-        return a / b
+        space(s)
+        let b = factor(s)
+        //console.log('term(b)', op, b)
+        if(b === undefined) {
+            console.log(`expected 'term', got ${s.line}, unknown 2nd factor`)
+            return undefined
+        }
+        if(op == "*") {
+            //console.log('term(a,op,b)',a,op,b)
+            a = a * b
+        } else if(op == "/") {
+            //console.log('term(a,op,b)',a,op,b)
+            a = a / b
+        }
     }
     return undefined
 }
@@ -480,6 +556,7 @@ function factor(s) {
     }
     let c = s.c()
     if(isnumer(c) || c == ".") {
+        //console.log("factor ", c)
         return scale * number(s)
     }
     if(isalpha(c) || c == "_") {
@@ -489,7 +566,7 @@ function factor(s) {
         return scale * value
     }
     if(c == "(") {
-        //console.log('factor (expr)')
+        //console.log('factor (expr)', s.line.slice(s.i))
         s.adv()
         space(s)
         let exp = expression(s)
@@ -600,6 +677,12 @@ plane 25 45 SE
 plane 35 45 SE
 plane 45 45 SE
 
+(1 + 2 + 3 ) / 2
+(12 + -37 + 90 + 90) / 2
+(90-12)
+(90-47)
+((90-12) + (90-47))
+((90-12) + (90-47))/2
 `
     let mem = {}
     for(const line of lines.split("\n")) {
@@ -634,6 +717,9 @@ class Vec {
             sum += sq[i]
         }
         return Math.sqrt(sum)
+    }
+    add(b) {
+        return new Vec([this.v[0] + b.v[0], this.v[1] + b.v[1], this.v[2] + b.v[2]])
     }
     raw() {
         return this.v
@@ -734,8 +820,7 @@ function cross(a, b) {
     return new Vec(c)
 }
 
-const p = document.getElementById("p")
-
+let p
 function vfmt(value) {
     return value.map(v => v.toFixed(4)).join(", ")
 }
@@ -756,13 +841,13 @@ export function pole_to_plane(strike, dip) {
 }
 
 export function two_poles_to_plane(trend1, plunge1, trend2, plunge2) {
-    p.textContent = ``
+    //p.textContent = ``
     let n1 = pole_normal(trend1, plunge1)
     let n2 = pole_normal(trend2, plunge2)
-    p.textContent += `n1 ${n1.fmt()}\n`
-    p.textContent += `n2 ${n2.fmt()}\n`
+    //p.textContent += `n1 ${n1.fmt()}\n`
+    //p.textContent += `n2 ${n2.fmt()}\n`
     let c = cross(n1, n2).down()
-    p.textContent += `c ${c.fmt()}\n`
+    //p.textContent += `c ${c.fmt()}\n`
     if(c.len() == 0) {
         return undefined
     }
@@ -832,5 +917,12 @@ export function pole_rotate(strike, dip, trend, plunge, angle) {
     let axis = pole_normal(strike, dip)
     let n = pole_normal(trend, plunge)
     let v = rotate_on_axis(axis, n, -angle)
+    return normal_to_line(v)
+}
+
+export function average_pole(trend1, plunge1, trend2, plunge2) {
+    let n1 = pole_normal(trend1, plunge1)
+    let n2 = pole_normal(trend2, plunge2)
+    let v = n1.add(n2).scale(0.5)
     return normal_to_line(v)
 }

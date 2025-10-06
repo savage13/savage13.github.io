@@ -10,7 +10,7 @@ function $(x) { return document.querySelector(x); }
 
 class Stereonet extends EventTarget {
 
-    constructor(id) {
+    constructor(id, options = {}) {
         super()
         this.canvas = $(id);
 
@@ -30,6 +30,9 @@ class Stereonet extends EventTarget {
             alert("Error: stereonet failed to getContext");
             return;
         }
+
+        this.background = options.bg || "white"
+        this.foreground = options.fg || "rgba(0,0,0,0.5)"
 
         // Lengths
         this.x0     = -this.canvas.width/2.0;
@@ -52,7 +55,6 @@ class Stereonet extends EventTarget {
         this.segments          = 17;
         this.reference_spacing = 10;
         this.reference_width   = 0.5;
-        this.reference_color   = 'rgba(0,0,0,0.5)';
         this.show_original_net = 1;
 
         this.pole_size  = 5;
@@ -83,17 +85,30 @@ class Stereonet extends EventTarget {
     // Functions
     clear() {
         this.cx.clearRect(this.x0, this.y0, this.width, this.height);
-        this.cx.fillStyle = "#FFFFFF";
+        this.cx.fillStyle = this.background;
         this.cx.fillRect(this.x0, this.y0, this.width, this.height);
         this.cx.fill();
+    }
+
+    resize() {
+        // Handle reset with change of window size
+        this.x0 = -this.canvas.width/2.0
+        this.y0 = -this.canvas.height/2.0
+        this.width = this.canvas.width
+        this.height = this.canvas.height
+        this.radius = (this.width/2.0) * 0.8
+        this.cx.setTransform(1, 0, 0, 1, 0, 0);
+        // Translate the canvas to put the middle at (0, 0)
+        this.cx.translate(this.width/2.0, this.height/2.0);
+
+        this.update()
     }
 
     reset() {
         this.angle = 0
         this.remove_all()
-        this.update()
+        this.resize()
     }
-    
 
     // Rotate the Steroenet and redraw
     rotate(angle) {
@@ -117,6 +132,7 @@ class Stereonet extends EventTarget {
     ticks() {
         for(var i = 0; i < 4; i++) {
             this.cx.save();
+            this.strokeStyle = this.foreground
             this.cx.rotate(i * Math.PI/2);
             this.cx.beginPath();
             this.cx.moveTo(0, -this.radius);
@@ -212,7 +228,7 @@ class Stereonet extends EventTarget {
         this.cx.moveTo(0, 0);
         this.cx.beginPath();
         this.cx.lineWidth = this.reference_width;
-        this.cx.strokeStyle = this.reference_color;
+        this.cx.strokeStyle = this.foreground
         this.cx.arc(0, 0, this.radius, 0.0, 2.0 * Math.PI, 1);
         this.cx.stroke();
         this.cx.restore();
@@ -231,7 +247,7 @@ class Stereonet extends EventTarget {
         this.cx.lineWidth = this.reference_width;
         this.circle();
         this.ticks();
-        this.cx.strokeStyle = this.reference_color;
+        this.cx.strokeStyle = this.foreground;
         this.reference_lines();
         this.north_tick();
     }

@@ -142,9 +142,11 @@ var defined_colors = { "aliceblue":"f0f8ff",
 
 function colorNameToHex(color)
 {
-
+    if(color[0] == "#" || color.startsWith("rgb(") || color.startsWith("rgba(")) {
+        return color
+    }
     if (typeof defined_colors[color.toLowerCase()] != 'undefined')
-        return defined_colors[color.toLowerCase()];
+        return '#' + defined_colors[color.toLowerCase()];
 
     return color;
 }

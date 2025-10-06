@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<head>
+  <meta name="color-scheme" content="light dark"/>
+</head>
+<div id="title">
+  Stereonet 3D Visualizer
+</div>
+<div id="top">
+  <div class="item">
+    <b>Plane</b>
+    <div>
+      <label>Strike</label>
+      <label id="strike_v">0</label>
+      <input type="range" min="0" max="360" step="1" id="strike" value="0">
+    </div>
+    <div>
+      <label>Dip</label>
+      <label id="dip_v">45</label>
+      <input type="range" min="0" max="90" step="1" id="dip" value="45">
+    </div>
+  </div>
+  <div class="item">
+    <b>Pole</b>
+    <div>
+      <label>Trend</label>
+      <label id="trend_v">0</label>
+      <input type="range" min="0" max="360" step="1" id="trend" value="0">
+    </div>
+    <div>
+      <label>Plunge</label>
+      <label id="plunge_v">45</label>
+      <input type="range" min="0" max="90" step="1" id="plunge" value="45">
+    </div>
+  </div>
+</div>
+<div class="split">
+  <div id="cw">
+    <canvas id="c" width="600" height="600" style="border:0"></canvas>
+  </div>
+  <div id="three"></div>
+</div>
+<pre id="out"></pre>
+<style>
+  body {
+      width: 100vw;
+      position: relative;
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background: #444444;
+      color: white;
+  }
+  #title {
+      margin: auto;
+      font-size: 1.4em;
+      text-align:center;
+      padding: 0.5em;
+  }
+  #editor {
+      position: relative;
+      height: 100%;
+      border: 1px solid #dddddd;
+      box-sizing: border-box;
+      flex-grow: 0;
+  }
+  #three {
+      position: relative;
+      flex-grow: 3;
+  }
+  #cw {
+      position: relative;
+      flex-grow: 0;
+  }
+  #top {
+      display: flex;
+      flex-flow: row nowrap;
+      gap: 1em;
+      padding: 0.5em;
+  }
+  .item {
+      border: 1px solid lightgray;
+      padding: 0.5em;
+      border-radius: 0.3em;
+  }
+  #c {
+      position: relative;
+  }
+  .split {
+      display: flex;
+      flex-direction: row;
+  }
+  label {
+      display: inline-block;
+      width: 4em;
+  }
+  .gutter {
+      background-color: #eee;
+      background-repeat: no-repeat;
+      background-position: 50%;
+  }
+  .gutter.gutter-horizontal {
+      background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+      cursor: col-resize;
+  }
+</style>
+
+<script src="stereonet.js"></script>
+<script src="Plane.js"></script>
+<script src="colornames.js"></script>
+<script src="commands.js"></script>
+<script src="quickjs.js"></script>
+<script type="module" src="main.js"></script>
+
