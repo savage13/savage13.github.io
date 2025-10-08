@@ -926,3 +926,65 @@ export function average_pole(trend1, plunge1, trend2, plunge2) {
     let v = n1.add(n2).scale(0.5)
     return normal_to_line(v)
 }
+
+export class Pole {
+    constructor(trend, plunge, opts = {}) {
+        this.trend = trend
+        this.plunge = plunge
+        this.type = "pole"
+        this.style = new Style(opts)
+        if(this.plunge > 90) {
+            this.plunge = 90.0 - this.plunge
+            this.trend = zero_360(this.trend + 180)
+        }
+    }
+    draw(net) {
+        let size = net.pole_size
+        net.cx.save()
+        net.cx.rotate((this.trend + 270) * Math.PI/180)
+        net.cx.beginPath()
+        this.style.fill(net)
+        let z = net.project(0.0, 90 - this.plunge)
+        //console.log(z, this.trend, this.plunge, net.radius, size, this.style)
+        net.cx.arc(net.radius * z.x, -net.radius * z.y, size, 0, 2.0 * Math.PI, 1)
+        net.cx.fill()
+        net.cx.restore()
+    }
+    average(p2) {
+        let a = average_pole(this.trend, this.plunge, p2.trend, p2.plunge)
+        return new Pole(a.trend, a.plunge)
+    }
+    shared_plane(p2) {
+        let p = two_poles_to_plane(this.trend, this.plunge, p2.trend, p2.plunge)
+        return new Plane2(p.strike, p.dip)
+    }
+}
+
+export class Plane2 {
+    constructor(strike, dip, opts = {}) {
+        this.strike = strike
+        this.dip = dip
+        this.type = "plane"
+        this.style = new Style(opts)
+        if(this.dip > 90) {
+            this.dip = 90 - this.dip
+            this.strike = zero_360(this.strike + 180)
+        }
+    }
+    draw(net) {
+        let width = net.plane_width
+        net.cx.save()
+        net.cx.rotate(this.strike * Math.PI / 180)
+        this.style.stroke(net)
+        net.great_circle( 90 - this.dip)
+        net.cx.restore()
+    }
+    normal() {
+        let p = pole_to_plane(this.strike, this.dip)
+        return new Pole(p.trend, p.plunge, { color: this.style.color } )
+    }
+    intersection(p2) {
+        let x = plane_plane_intersection(this.strike, this.dip, p2.strike, p2.dip)
+        return new Pole(x.trend, x.plunge)
+    }
+}

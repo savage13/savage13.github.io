@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chapter 5</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.css" integrity="sha384-D+9gmBxUQogRLqvARvNLmA9hS2x//eK1FhVb9PiU86gmcrBrJAQT8okdJ4LMp2uv" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.js" integrity="sha384-483A6DwYfKeDa0Q52fJmxFXkcPCFfnXMoXblOkJ4JcA8zATN6Tm78UNL72AKk+0O" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/contrib/auto-render.min.js" integrity="sha384-yACMu8JWxKzSp/C1YV86pzGiQ/l1YUfE8oPuahJQxzehAjEt2GiQuy/BIvl9KyeF" crossorigin="anonymous"
+            onload="renderMathInElement(document.body);"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+
+    <script src="stereonet.js"></script>
+    <script src="Plane.js"></script>
+    <script src="colornames.js"></script>
+    <!-- <script src="v4chp3.js" defer></script> -->
+    <style>
+      #n52 {
+          position: relative;
+      }
+      .lil-gui {
+          position: absolute;
+          top: 0;
+          right: 0;
+               
+      }
+    </style>
+  </head>
+  <body>
+    <a name="p01"/><h2>Problem 5.1</h2>
+
+    Construct a \( \beta \) and/or \( \pi \) diagram for the mapped featues.
+    <p>
+    Plot all measured surfaces (plane) on a stereonet.  These diagrams are basically the same, plotting the planes is a bit easier and includes a couple less steps.  Plotting the poles requires extra steps, but is better when you have lots of measurements.
+    <p>
+      The intersection is the fold axis. It should have a trend and plunge
+    <p>
+      Use the fold axis to project the map onto the fold profile plane
+    <p>
+      You will project in the direction of the trend and project (or shorten) by \( \sin \) plunge
+    <p>
+      <canvas id="c51" width="500" height="500" style="border:0px;"></canvas>
+
+    <a name="p02"/><h2>Problem 5.2 and Problem 5.3</h2>
+
+    <p>
+      Plot the limbs of the fold (also plot the poles to the planes) <span style="color:red">Red</span> and <span style="color:blue"> Blue</span> Lines
+    <p>
+      Determine the <span style="color: fuchsia;">fold axis </span>by the intersection of the limbs. What is the trend and the plunge
+    <p>
+      Plot the poles to the planes for each limb,  <span style="color:red">Red</span> and <span style="color:blue"> Blue</span> points
+    <p>
+      The interlimb angle is \( 180 - \theta \) where \( \theta \) is the angle between the poles to the limbs / planes.  Measure this angle along the great circle
+    <p>
+      The <span style="color: orange">Axial plane</span> goes through the <span style="color: fuchsia;">fold axis</span> and the the <span style="color: lime">point halfway between the poles to the planes / limb</span>
+
+      <canvas id="c52" width="500" height="500" style="border:0px;"></canvas>
+      <div id="n52" style="width: 500px; height: 500px; margin: auto;"></div>
+  </body>
+  <script type="module" defer>
+    import { pole_to_plane, plane_plane_intersection, average_pole, two_poles_to_plane } from './math.js'
+    import { Pole, Plane2 } from './math.js'
+    import { Stereonet3D, gui as guix } from './net3d.js'
+    let c51 = new Stereonet('#c51')
+
+    c51.add(new Plane({type: "plane", strike: -45, dip: 45}))
+    c51.add(new Plane({type: "plane", strike: 270, dip: 45}))
+    c51.add(new Plane({type: "plane", strike: 15, dip: 80}))
+    c51.add(new Plane({type: "plane", strike: 45+180, dip: 70}))
+    c51.add(new Plane({type: "pole", strike: 25, dip: 43, color: "fuchsia"}))
+
+    let items = {}
+
+    let c52 = new Stereonet("#c52")
+    let n52 = new Stereonet3D('n52')
+
+    let p1 = new Plane2( 35, 25, {color:"red"})
+    let p2 = new Plane2( 90, 45, {color:"blue"})
+
+    c52.add( p1 )
+    c52.add( p2 )
+
+    n52.add(p1, "Plane1")
+    n52.add(p2, "Plane2")
+    
+    let n1 = p1.normal()
+    let n2 = p2.normal()
+
+    c52.add(n1)
+    c52.add(n2)
+
+    n52.add(n1, "Pole1")
+    n52.add(n2, "Pole2")
+
+    let x = p1.intersection(p2)
+    x.style.color = "fuchsia"
+    c52.add(x)
+
+    n52.add(x, "Intersection")
+
+    let a = n1.average(n2)
+    a.style.color = "lime"
+    c52.add(a)
+    n52.add(a, "Halfway")
+
+    let as = x.shared_plane(a)
+    as.style.color = "orange"
+    c52.add(as)
+
+    n52.add(as, "AxialSurface")
+
+    items.Plane1 = p1
+    items.Pole1 = n1
+    items.Plane2 = p2
+
+    items.Pole2 = n2
+    items.Intersection = x
+    items.Halfway = a
+    items.AxialSurface = as
+
+    const gui = new guix.GUI({container: $('#n52')})
+    gui.close()
+    const obj = Object.fromEntries(Object.keys(items).map(key => [key, true]))
+    for(const key of Object.keys(items)) {
+        gui.add(obj, key)
+    }
+    gui.onChange( (ev) => {
+        if(!ev.value) {
+            n52.remove(ev.property)
+        } else {
+            n52.add(items[ev.property], ev.property)
+        }
+    })
+  </script>
+</html>

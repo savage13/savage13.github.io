@@ -89,6 +89,7 @@ var SmallCircle = function(obj) {
     this.error = 0;
 }
 
+
 var Plane = function( obj ) {
     var strike, dip, type, color;
     var def = {
