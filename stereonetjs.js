@@ -215,10 +215,6 @@ let delay = 200
 let color = "black"
 let speed = 1
 
-export function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 async function run_one(i, line) {
     //console.log(i, line)
     //editor.getSession().clearBreakpoints()
@@ -253,6 +249,12 @@ async function run_one(i, line) {
     //console.log(line, 'done')
 }
 */
+
+
+export function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export async function rot_animate(can, angle, duration) {
     let start = undefined
     let a0 = can.angle * 180.0 / Math.PI

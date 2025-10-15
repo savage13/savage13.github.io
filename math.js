@@ -985,7 +985,8 @@ export class Pole {
     opts() {
         return {
             color: this.style.color,
-            opacity: this.style.opacity
+            opacity: this.style.opacity,
+            id: this.id
         }
     }
     copy() {

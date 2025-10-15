@@ -74,7 +74,7 @@
     import { Pole, Plane2 } from './math.js'
     import { Stereonet3D, gui as guix } from './net3d.js'
 
-    import { netjs, netjs_init, net_set, sleep, rot_animate, pole_rotate_animate, animate } from './stereonetjs.js'
+    import { sleep, rot_animate, pole_rotate_animate, animate } from './stereonetjs.js'
 
     let ids = []
 
@@ -114,7 +114,7 @@
         c61 = new Stereonet('#c61')
         n61 = new Stereonet3D('n61')
         let delay = 2000
-        net_set(c61)
+        //net_set(c61)
 
         let p1 = new Pole(45, 45, {color: "red", id: "p1"})
         let p2 = new Pole(-35, 60, {color: "blue", id: "p2"})
@@ -182,8 +182,8 @@
 
         let angle = min_angle + pct/100 * (max_angle - min_angle)
         document.getElementById("rotate_v").textContent = angle.toFixed(1)
-        let n1 = nyoung.rotate(axis, angle)
-        let n2 = nold.rotate(axis, angle)
+        let n1 = nyoung2.rotate(axis, angle)
+        let n2 = nold2.rotate(axis, angle)
         n62.add( n1.plane().opacity(opacity).uid("young_plane_rotate"))
         n62.add( n1.opacity(1.0).uid("young_pole_rotate"))
         n62.add( n2.plane().opacity(opacity).uid("old_plane_rotate"))
@@ -197,13 +197,15 @@
     let axis = null
     let nyoung = null
     let nold = null
+    let nyoung2 = null
+    let nold2 = null
         
     async function p62() {
         let c62 = new Stereonet('#c62')
         n62 = new Stereonet3D('n62')
         let old = new Plane2(45, 20, {color: "red", opacity: 0.3})
         let young = new Plane2(135, 40, {color: "blue", opacity: 0.3})
-        let delay = 1500
+        let delay = 300
 
         c62.add(old)
         n62.add(old, "plane_old")
@@ -235,20 +237,22 @@
 
         let nyoung1 = nyoung.copy().opacity(opacity)
         let nold1 = nold.copy().opacity(opacity)
+        nyoung1.style.color = "green"
+        nold1.style.color = "orange"
 
         animate(c62, (dt) => {
             let angle = Math.min(min_angle + dt * (max_angle - min_angle)/delay, max_angle)
             if(angle >= max_angle)
                 return undefined
             let p = pole_rotate(young.strike, 0, nyoung.trend, nyoung.plunge, angle)
-            return new Pole(p.trend, p.plunge, { color: "blue" })
+            return new Pole(p.trend, p.plunge, { color: "green" })
         })
         animate(c62, (dt) => {
             let angle = Math.min(min_angle + dt * (max_angle - min_angle)/delay, max_angle)
             if(angle >= max_angle)
                 return undefined
             let p = pole_rotate(young.strike, 0, nold.trend, nold.plunge, angle)
-            return new Pole(p.trend, p.plunge, { color: "red" })
+            return new Pole(p.trend, p.plunge, { color: "orange" })
         })
 
         let tangle = (dt) => {
@@ -261,8 +265,15 @@
         animate(n62, (dt) => { return nold1.rotate(axis, tangle(dt))?.plane()  })
         await animate(n62, (dt) => { return nold.rotate(axis, tangle(dt)) })
 
-        let y = nyoung.rotate(axis, max_angle-1e-8).uid("young_pole_rotate")
-        let o = nold.rotate(axis, max_angle-1e-8).uid("old_pole_rotate")
+        nyoung2 = nyoung.copy()
+        nold2 = nold.copy()
+
+        nyoung2.style.color = "green"
+        nold2.style.color = "orange"
+
+        let y = nyoung2.rotate(axis, max_angle-1e-8).uid("young_pole_rotate")
+        let o = nold2.rotate(axis, max_angle-1e-8).uid("old_pole_rotate")
+
         n62.add(y)
         n62.add(o)
         c62.add(y)
@@ -280,75 +291,5 @@
         await rot_animate(c62, -(135-90), delay)
     }
     p62()
-    /*
-    c51.add(new Plane({type: "plane", strike: -45, dip: 45}))
-    c51.add(new Plane({type: "plane", strike: 270, dip: 45}))
-    c51.add(new Plane({type: "plane", strike: 15, dip: 80}))
-    c51.add(new Plane({type: "plane", strike: 45+180, dip: 70}))
-    c51.add(new Plane({type: "pole", strike: 25, dip: 43, color: "fuchsia"}))
-
-    let items = {}
-
-    let c52 = new Stereonet("#c52")
-    let n52 = new Stereonet3D('n52')
-
-    let p1 = new Plane2( 35, 25, {color:"red"})
-    let p2 = new Plane2( 90, 45, {color:"blue"})
-
-    c52.add( p1 )
-    c52.add( p2 )
-
-    n52.add(p1, "Plane1")
-    n52.add(p2, "Plane2")
-
-    let n1 = p1.normal()
-    let n2 = p2.normal()
-
-    c52.add(n1)
-    c52.add(n2)
-
-    n52.add(n1, "Pole1")
-    n52.add(n2, "Pole2")
-
-    let x = p1.intersection(p2)
-    x.style.color = "fuchsia"
-    c52.add(x)
-
-    n52.add(x, "Intersection")
-
-    let a = n1.average(n2)
-    a.style.color = "lime"
-    c52.add(a)
-    n52.add(a, "Halfway")
-
-    let as = x.shared_plane(a)
-    as.style.color = "orange"
-    c52.add(as)
-
-    n52.add(as, "AxialSurface")
-
-    items.Plane1 = p1
-    items.Pole1 = n1
-    items.Plane2 = p2
-    items.Pole2 = n2
-    items.Intersection = x
-    items.Halfway = a
-    items.AxialSurface = as
-
-    cons
-    t gui = new guix.GUI({container: $('#n52')})
-    gui.close()
-    const obj = Object.fromEntries(Object.keys(items).map(key => [key, true]))
-    for(const key of Object.keys(items)) {
-        gui.add(obj, key)
-    }
-    gui.onChange( (ev) => {
-        if(!ev.value) {
-            n52.remove(ev.property)
-        } else {
-            n52.add(items[ev.property], ev.property)
-        }
-    })
-    */
   </script>
 </html>
