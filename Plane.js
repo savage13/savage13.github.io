@@ -22,11 +22,12 @@ var Style = function(obj) {
     var def = {
         width: 2,
         color:'black',
+        opacity: 1.0,
     };
     obj = apply_defaults(def, obj);
-    this.width   = obj.width;
-    this.color   = obj.color;
-
+    this.width   = obj.width
+    this.color   = obj.color
+    this.opacity = obj.opacity
     this.stroke = function(net) {
         net.cx.strokeStyle = colorNameToHex(this.color);
         net.cx.lineWidth   = this.width;

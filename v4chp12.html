@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chapter 6</title>
+    <!--
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.css" integrity="sha384-D+9gmBxUQogRLqvARvNLmA9hS2x//eK1FhVb9PiU86gmcrBrJAQT8okdJ4LMp2uv" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.js" integrity="sha384-483A6DwYfKeDa0Q52fJmxFXkcPCFfnXMoXblOkJ4JcA8zATN6Tm78UNL72AKk+0O" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/contrib/auto-render.min.js" integrity="sha384-yACMu8JWxKzSp/C1YV86pzGiQ/l1YUfE8oPuahJQxzehAjEt2GiQuy/BIvl9KyeF" crossorigin="anonymous"
+            onload="renderMathInElement(document.body);"></script>
+    -->
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+    <script src="stereonet.js"></script>
+    <script src="Plane.js"></script>
+    <script src="colornames.js"></script>
+    <style>
+      #n52 {
+          position: relative;
+      }
+      .lil-gui {
+          position: absolute;
+          top: 0;
+          right: 0;
+
+      }
+    </style>
+  </head>
+  <body>
+    <a name="p01"/><h2>Problem 12.1</h2>
+
+    Determine the amount of slip on the fault using a cross cutting feature, here a dike
+
+    <p>
+      Rotate the along the small circle by the amount indicated
+      <div>
+        <input type="range" min="45" max="90" value="60" id="dip">
+        <label for="dip" id="dipv">45</label>
+        <label>Fault Dip</label>
+      </div>
+      <div>
+        <input type="range" min="45" max="90" value="60" id="ddip">
+        <label for="ddip" id="ddipv">45</label>
+        <label>Dike Dip</label>
+      </div>
+      <div>
+        <input type="range" min="-45" max="45" value="0" id="dstrike">
+        <label for="dstrike" id="dstrikev">45</label>
+        <label>Dike Strike</label>
+      </div>
+      <div>
+        <input type="range" min="-10" max="10" value="0" step="0.1" id="strikeslip">
+        <label for="strikeslip" id="strikeslipv">0</label>
+        <label>Strike Slip</label>
+      </div>
+      <div>
+        <input type="range" min="-10" max="10" value="0" step="0.1" id="dipslip">
+        <label for="dipslip" id="dipslipv">0</label>
+        <label>Dip Slip</label>
+      </div>
+    <p>
+      <div id="n121" style="width: 500px; height: 500px; margin: auto;"></div>
+      <canvas id="c121" width="500" height="500" style="border:0px;"></canvas>
+
+      <a name="p02"/><h2>Problem 12.2</h2>
+      <!--
+        <canvas id="c62" width="500" height="500" style="border:0px;"></canvas>
+        <div id="n62" style="width: 500px; height: 500px; margin: auto;"></div>
+        <input type="range" min="0" max="100" value="0" id="rotate">
+        <label for="rotate" id="rotate_v"></label>
+      -->
+    </p>
+    
+    <script type="module" defer>
+      import { pole_to_plane, plane_plane_intersection, average_pole, two_poles_to_plane, pole_rotate, plane_to_pole } from './math.js'
+      import { Pole, Plane2 } from './math.js'
+      import { Stereonet3D, gui as guix, THREE, OrbitControls } from './net3d.js'
+
+      import { netjs, netjs_init, net_set, sleep, rot_animate, pole_rotate_animate, animate } from './stereonetjs.js'
+
+      let scene
+      let camera
+      let renderer
+      let controls
+      let gui
+      let c121
+      
+      async function p12_1() {
+          scene = new THREE.Scene()
+          scene.background = new THREE.Color( 0x444444 )
+          let el = document.getElementById("n121")
+          let rect = el.getBoundingClientRect()
+
+          camera = new THREE.PerspectiveCamera(
+              75, rect.width / rect.height, 0.1, 1000)
+          renderer = new THREE.WebGLRenderer()
+          renderer.setSize(rect.width, rect.height)
+          el.appendChild( renderer.domElement)
+
+          light()
+          blocks()
+
+          camera.position.y = 2
+          camera.position.x = -15
+          camera.position.z = 0
+          camera.up.set(0, 1, 0)
+
+          controls = new OrbitControls(camera, renderer.domElement)
+          controls.enableDampling = false
+          controls.enabled = true
+
+          renderer.setAnimationLoop( animate3D )
+          set_dike_wrap()
+
+          const keys = Object.fromEntries(Object.keys(items).map(v => [v, items[v].material.opacity]))
+
+          gui = new guix.GUI()
+          for(const key of Object.keys(items))  {
+              gui.add(keys, key, 0, 1).onChange(value => { changeAlpha({name: key, value})})
+          }
+
+          c121 = new Stereonet('#c121')
+          net_update()
+      }
+
+      let net_items = []
+      function net_draw() {
+          let strike = 180
+          let dip = parseFloat($('#dip').value)
+          let fault = new Plane2(strike, dip, {color: "red"})
+          c121.add(fault)
+
+          let dstrike = parseFloat($('#dstrike').value)
+          let ddip = parseFloat($('#ddip').value)
+          let dike = new Plane2(90 + dstrike, ddip, {color: "lime"})
+          c121.add(dike)
+      }
+      function net_update() {
+          if(c121) {
+              c121.reset()
+              net_draw()
+          }
+          
+      }
+
+      function changeAlpha(ev) {
+          items[ev.name].material.opacity = ev.value
+          items[ev.name].material.needsUpdate = true
+      }
+      function animate3D() {
+          controls.update()
+          if (resizeRendererToDisplaySize(renderer)) {
+              const canvas = renderer.domElement
+              camera.aspect = canvas.clientWidth / canvas.clientHeight
+              camera.updateProjectionMatrix()
+          }
+          renderer.render(scene, camera)
+      }
+      function resizeRendererToDisplaySize(renderer) {
+          const canvas = renderer.domElement
+          const width = canvas.clientWidth
+          const height = canvas.clientHeight
+          const needResize = canvas.width !== width || canvas.height !== height
+          if (needResize) {
+              renderer.setSize(width, height, false)
+          }
+          return needResize
+      }
+      function light() {
+          const ambientLight = new THREE.AmbientLight( 0x000000 );
+          scene.add( ambientLight );
+
+          const light1 = new THREE.DirectionalLight( 0xffffff, 20 );
+          light1.position.set( 0, 300, 0 );
+          scene.add( light1 );
+
+          const light2 = new THREE.DirectionalLight( 0xffffff, 20 );
+          light2.position.set( 100, 200, 100 );
+          scene.add( light2 );
+
+          const light3 = new THREE.DirectionalLight( 0xffffff, 20 );
+          light3.position.set( -100, -200, -100 );
+          scene.add( light3 );
+      }
+
+      let items = {}
+      let scale = 10
+
+      function fault_bottom(mesh, name, func) {
+          let index = []
+          const pos = mesh.geometry.getAttribute('position')
+          for(let i = 0; i < pos.array.length; i+= 3) {
+              if(func(pos.array.slice(i,i+3))) {
+                  index.push(i/3)
+              }
+          }
+          mesh.userData[name] = index
+      }
+
+      function close(a, b) {
+          return Math.abs(a-b) < 1e-4
+      }
+
+      function blocks() {
+          let width = 0.3
+          let bsize = (2*scale - width)/2
+          let offset = {x: 2*scale-bsize/2, y: -scale/2, z: -scale + scale/2}
+
+          let ybot = -scale
+          let fault_bot = (v) => { return close(v[1],ybot) && close(v[2],0) }
+          let dike_bot = (v) => { return !close(v[0], 0) && !close(v[0], 2*scale) }
+
+          let b
+
+          b = block(offset, [bsize,scale,scale], "#049ef4", 0.2)
+          fault_bottom(b, 'fault_dip_index', fault_bot)
+          fault_bottom(b, 'dike_dip_index', dike_bot)
+          fault_bottom(b, 'index', (v) => { return true })
+          fault_bottom(b, 'index_fault', (v) => { return true })
+          b.userData.pos0 = b.geometry.getAttribute('position').clone()
+          items['LeftTop'] = b
+          //console.log(b.userData.pos0.array.filter((v,i) => i % 3 == 2))
+
+          offset.x = bsize/2
+          b = block(offset, [bsize,scale,scale], "#049ef4", 0.2)
+          fault_bottom(b,  'fault_dip_index', fault_bot)
+          fault_bottom(b,  'dike_dip_index', dike_bot)
+          fault_bottom(b, 'index', (v) => { return true })
+          fault_bottom(b, 'index_fault', (v) => { return true })
+          b.userData.pos0 = b.geometry.getAttribute('position').clone()
+          items['LeftBot'] = b
+
+          //console.log(b.userData.pos0.array.filter((v,i) => i % 3 == 2))
+
+          offset.x = scale
+          b = block(offset, [width, scale,scale], "green", 1.0)
+          fault_bottom(b,  'fault_dip_index', fault_bot)
+          fault_bottom(b,  'dike_dip_index', dike_bot)
+          fault_bottom(b, 'index', (v) => { return true })
+          fault_bottom(b, 'index_fault', (v) => { return true })
+          fault_bottom(b, 'index_dike', (v) => { return true })
+          b.userData.pos0 = b.geometry.getAttribute('position').clone()
+          items.LeftDike = b
+
+          {
+              offset.y = 0
+              offset.x = 2 * scale - bsize/2
+              b = block(offset, [bsize, 0.1, scale], "#049ef4", 0.1)
+              items['LeftTopSurface'] = b
+              fault_bottom(b, 'index', (v) => {return true})
+              fault_bottom(b, 'surface_index', (v) => {return true})
+              b.userData.pos0 = b.geometry.getAttribute('position').clone()
+
+              offset.x = bsize/2
+              b = block(offset, [bsize, 0.1, scale], "#049ef4", 0.1)
+              items['LeftBotSurface'] = b
+              fault_bottom(b, 'index', (v) => {return true})
+              fault_bottom(b, 'surface_index', (v) => {return true})
+              b.userData.pos0 = b.geometry.getAttribute('position').clone()
+
+              offset.x = scale
+              b = block(offset, [width, 0.1, scale], "green", 0.1)
+              items['LeftDikeSurface'] = b
+              fault_bottom(b, 'index', (v) => {return true})
+              fault_bottom(b, 'surface_index', (v) => {return true})
+              b.userData.pos0 = b.geometry.getAttribute('position').clone()
+          }
+
+          offset.y = -scale/2
+          offset.x = 2*scale-bsize/2
+          offset.z = scale/2 - 1e-5
+          b = block(offset, [bsize,scale,scale], "#f42004", 0.2)
+          fault_bottom(b,  'fault_dip_index', fault_bot)
+          fault_bottom(b,  'dike_dip_index', dike_bot)
+          fault_bottom(b, 'index', (v) => { return true })
+          b.userData.pos0 = b.geometry.getAttribute('position').clone()
+          items.RightTop = b
+
+          offset.x = bsize/2
+          offset.z = scale/2 - 1e-5
+          b = block(offset, [bsize,scale,scale], "#f42004", 0.2)
+          fault_bottom(b,  'fault_dip_index', fault_bot)
+          fault_bottom(b,  'dike_dip_index', dike_bot)
+          fault_bottom(b, 'index', (v) => { return true })
+          b.userData.pos0 = b.geometry.getAttribute('position').clone()
+          items.RightBot = b
+
+          offset.x = scale
+          b = block(offset, [width, scale,scale], "green", 1.0)
+          fault_bottom(b,  'fault_dip_index', fault_bot)
+          fault_bottom(b,  'dike_dip_index', dike_bot)
+          fault_bottom(b, 'index', (v) => { return true })
+          b.userData.pos0 = b.geometry.getAttribute('position').clone()
+          items.RightDike = b
+      }
+
+      function block(offset, size, color, opacity = 1) {
+          let geometry = new THREE.BoxGeometry(size[0], size[1], size[2])
+          //console.log(offset)
+          geometry.translate(offset.x, offset.y, offset.z)
+          geometry.getAttribute('position').setUsage( THREE.DynamicDrawUsage );
+
+          const material = material_create(color, opacity)
+
+          const mesh = new THREE.Mesh(geometry, material)
+          scene.add(mesh)
+          mesh.userData.index = []
+          return mesh
+      }
+
+      function material_create(color, opacity) {
+          return new THREE.MeshStandardMaterial({
+              color, roughness: 1.0, metalness: 1.0,
+              transparent: true, opacity,
+              depthWrite: false,
+              side: THREE.DoubleSide
+          })
+      }
+      
+      p12_1()
+
+      function $(x) { return document.querySelector(x) }
+
+      $("#dip").addEventListener('input', (ev) => {
+          set_dike_wrap()
+      })
+      $("#ddip").addEventListener('input', set_dike_wrap)
+      $("#dstrike").addEventListener('input', set_dike_wrap)
+      $("#strikeslip").addEventListener('input', set_dike_wrap)
+      $("#dipslip").addEventListener('input', set_dike_wrap)
+
+      function set_dike_wrap() {
+          let fdip = parseFloat($('#dip').value)
+          let dip = parseFloat($('#ddip').value)
+          let strike = parseFloat($('#dstrike').value)
+          let ss = parseFloat($('#strikeslip').value)
+          let ds = parseFloat($('#dipslip').value)
+          $('#dipv').textContent = fdip.toFixed(0)
+          $('#dstrikev').textContent = (90 + strike).toFixed(0)
+          $('#ddipv').textContent = dip.toFixed(0)
+          $('#strikeslipv').textContent = ss.toFixed(1)
+          $('#dipslipv').textContent = ds.toFixed(1)
+          set_dike(-strike, dip, fdip, ss, ds)
+          set_fault_dip(fdip)
+          net_update()
+      }
+      function cosd(v) { return Math.cos(v * Math.PI / 180) }
+      function tand(v) { return Math.tan(v * Math.PI / 180) }
+      function sind(v) { return Math.sin(v * Math.PI / 180) }
+
+      function set_vertex_to_value(mesh, name, func) {
+          let pos = mesh.geometry.getAttribute('position')
+          let pos0 = mesh.userData.pos0
+          let v = new THREE.Vector3()
+          let v0 = new THREE.Vector3()
+          for(const k of (mesh.userData[name] || [])) {
+              v.fromBufferAttribute(pos, k)
+              v0.fromBufferAttribute(pos0, k) // Initial, undeformed state
+              func(v, v0)
+              pos.setXYZ(k, v.x, v.y, v.z)
+          }
+          pos.needsUpdate = true
+      }
+
+      function set_fault_dip(dip) {
+      }
+      function set_dike(strike, dip, fdip, ss, ds) {
+          const X = 0
+          const Y = 1
+          const Z = 2
+          for(const item of Object.values(items)) {
+              set_vertex_to_value(item, 'index', (v, v0) => { // Reset (all items should include this)
+                  v.setComponent(X, v0.x)
+                  v.setComponent(Y, v0.y)
+                  v.setComponent(Z, v0.z)
+              })
+          }
+          for(const item of Object.values(items)) {
+              set_vertex_to_value(item, 'index_fault', (v, v0) => { // True Shift of Hanging Wall Block (Left side)
+                  v.setComponent(X, v.x + ss )
+                  v.setComponent(Y, v.y + ds * sind(fdip))
+                  v.setComponent(Z, v.z + ds * cosd(fdip))
+              })
+          }
+          for(const item of Object.values(items)) {
+              set_vertex_to_value(item, 'surface_index', (v, v0) => { // Surface Shift of Hanging Wall Block (Left side)
+                  let z = v0.y / tand(fdip)
+                  v.setComponent(X, v.x + ss - ds * sind(fdip) / tand(dip) + v0.z * cosd(90 - strike))
+                  //v.setComponent(Y, v.y + ds * sind(fdip))
+                  //v.setComponent(Z, v.z + ds * cosd(fdip))
+              })
+          }
+          for(const item of Object.values(items)) {
+              set_vertex_to_value(item, 'index_dike', (v, v0) => {
+                  //v.setComponent(X, v.x - ds * sind(fdip) / tand(dip))
+              })
+          }
+          for(const item of Object.values(items)) {
+              set_vertex_to_value(item, 'fault_dip_index', (v,v0) => { // Change of Fault block volume based from Fault Dip
+                  v.setComponent(2, v.z - scale/tand(fdip))
+              })
+          }
+          for(const item of Object.values(items)) {
+              set_vertex_to_value(item, 'dike_dip_index', (v,v0) => {
+                  if(!close(v0.z, 0))  {
+                      v.setComponent(X, v.x + v0.y/tand(dip) + v0.z * cosd(90 - strike))
+                  } else {
+                      let z = v0.y / tand(fdip)
+                      v.setComponent(X, v.x + v0.y/tand(dip) + z * cosd(90 - strike))
+                  }
+              })
+          }
+      }
+
+
+  </script>
+</html>

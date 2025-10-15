@@ -525,6 +525,4 @@ class Stereonet extends EventTarget {
             debug("putImageData not available");
         }
     }
-
-
 }

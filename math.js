@@ -757,6 +757,7 @@ export function plane_normal(strike, dip) {
     return new Vec([x,y,z]).down().norm()
 }
 
+// Get the vector equivalent of a pole
 export function pole_normal(trend, plunge) {
     // Assuming the angle (plunge) is positive down
     //  so we use the negative plunge to make z down
@@ -770,6 +771,7 @@ export function pole_normal(trend, plunge) {
     return new Vec([x,y,z]).down().norm()
 }
 
+// Get the pole equivalent for a vector
 export function normal_to_line(n) {
     n = n.down().raw()
     let x = n[0]
@@ -792,6 +794,7 @@ export function normal_to_line(n) {
     return { trend, plunge }
 }
 
+// Get plane from normal vector
 function normal_to_plane(n) {
     // Force normal to be facing down
     n = n.down().raw()
@@ -825,6 +828,7 @@ function vfmt(value) {
     return value.map(v => v.toFixed(4)).join(", ")
 }
 
+// Gets intersection between two planes
 export function plane_plane_intersection(strike1, dip1, strike2, dip2) {
 
     let n1 = plane_normal(strike1, dip1)
@@ -836,8 +840,13 @@ export function plane_plane_intersection(strike1, dip1, strike2, dip2) {
     return normal_to_line(c)
 }
 
+
+// Gets the normal (or pole) for a plane
 export function pole_to_plane(strike, dip) {
     return normal_to_line(plane_normal(strike, dip))
+}
+export function plane_to_pole(trend, plunge) {
+    return normal_to_plane(pole_normal(trend, plunge))
 }
 
 export function two_poles_to_plane(trend1, plunge1, trend2, plunge2) {
@@ -933,6 +942,7 @@ export class Pole {
         this.plunge = plunge
         this.type = "pole"
         this.style = new Style(opts)
+        this.id = opts.id || undefined
         if(this.plunge > 90) {
             this.plunge = 90.0 - this.plunge
             this.trend = zero_360(this.trend + 180)
@@ -956,7 +966,34 @@ export class Pole {
     }
     shared_plane(p2) {
         let p = two_poles_to_plane(this.trend, this.plunge, p2.trend, p2.plunge)
-        return new Plane2(p.strike, p.dip)
+        return new Plane2(p.strike, p.dip, this.opts())
+    }
+    rotate(axis, angle) {
+        if(angle == undefined)
+            return undefined
+        let p = pole_rotate(axis.trend, axis.plunge, this.trend, this.plunge, angle)
+        return new Pole(p.trend, p.plunge, this.opts())
+    }
+    plane() {
+        let p = plane_to_pole(this.trend, this.plunge)
+        return new Plane2(p.strike, p.dip, this.opts())
+    }
+    opacity(value) {
+        this.style.opacity = value
+        return this
+    }
+    opts() {
+        return {
+            color: this.style.color,
+            opacity: this.style.opacity
+        }
+    }
+    copy() {
+        return new Pole(this.trend, this.plunge, this.opts())
+    }
+    uid(value) {
+        this.id = value
+        return this
     }
 }
 
@@ -966,6 +1003,7 @@ export class Plane2 {
         this.dip = dip
         this.type = "plane"
         this.style = new Style(opts)
+        this.id = undefined
         if(this.dip > 90) {
             this.dip = 90 - this.dip
             this.strike = zero_360(this.strike + 180)
@@ -981,10 +1019,25 @@ export class Plane2 {
     }
     normal() {
         let p = pole_to_plane(this.strike, this.dip)
-        return new Pole(p.trend, p.plunge, { color: this.style.color } )
+        return new Pole(p.trend, p.plunge, this.opts())
     }
     intersection(p2) {
         let x = plane_plane_intersection(this.strike, this.dip, p2.strike, p2.dip)
-        return new Pole(x.trend, x.plunge)
+        return new Pole(x.trend, x.plunge, this.opts())
     }
+    opacity(value) { // 0.0 to 1.0
+        this.style.opacity = value
+        return this
+    }
+    opts() {
+        return {
+            color: this.style.color,
+            opacity: this.style.opacity
+        }
+    }
+    uid(value) {
+        this.id = value
+        return this
+    }
+
 }

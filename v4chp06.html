@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chapter 6</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.css" integrity="sha384-D+9gmBxUQogRLqvARvNLmA9hS2x//eK1FhVb9PiU86gmcrBrJAQT8okdJ4LMp2uv" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.js" integrity="sha384-483A6DwYfKeDa0Q52fJmxFXkcPCFfnXMoXblOkJ4JcA8zATN6Tm78UNL72AKk+0O" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/contrib/auto-render.min.js" integrity="sha384-yACMu8JWxKzSp/C1YV86pzGiQ/l1YUfE8oPuahJQxzehAjEt2GiQuy/BIvl9KyeF" crossorigin="anonymous"
+            onload="renderMathInElement(document.body);"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+
+    <script src="stereonet.js"></script>
+    <script src="Plane.js"></script>
+    <script src="colornames.js"></script>
+    <style>
+      #n52 {
+          position: relative;
+      }
+      .lil-gui {
+          position: absolute;
+          top: 0;
+          right: 0;
+
+      }
+    </style>
+  </head>
+  <body>
+    <a name="p01"/><h2>Problem 6.1</h2>
+
+    Plot the pole
+
+    <p>
+      Rotate the along the small circle by the angle indicated
+    <p>
+      We are rotating about an axis pointing north that is horizontal
+
+    <p>
+      <div>
+        <label>Rotation Angle</label>
+        <input id="angle" type="range" min="-180" max="180" value="0">
+        <label id="anglev"></label>
+      </div>
+      <div>
+        <label>Clear 3D Poles</label>
+        <input id="clear" type="checkbox" checked>
+      </div>
+      <canvas id="c61" width="500" height="500" style="border:0px;"></canvas>
+      <div id="n61" style="width: 500px; height: 500px; margin: auto;"></div>
+
+      <a name="p02"/><h2>Problem 6.2</h2>
+
+    <p> Given two beds, <span style="color: red">one older</span> than <span style="color:blue">the younger</span>, plot the poles to the planes (beds)
+    <p> Move the <span style="color: blue">younger pole</span> to the east-west line and rotate the pole along the small circle to the center
+      of the stereonet.  This make the pole vertical and the bed horizontal
+    <p>Rotate the <span style="color: red">older bed</span> in the same direction and the same angle that the younger bed was rotated
+    <p>Convert the older bed's pole to a <span style="color: lime">plane</span> and indicate its attitude
+      <canvas id="c62" width="500" height="500" style="border:0px;"></canvas>
+      <div id="n62" style="width: 500px; height: 500px; margin: auto;"></div>
+
+      <input type="range" min="0" max="100" value="0" id="rotate">
+      <label for="rotate" id="rotate_v"></label>
+      <a name="p03"/><h2>Problem 6.3</h2>
+    <p>
+      This is the same a Problem 6.2 but the lineation (magnetic direction) is what you are looking for
+
+      <a name="p04"/><h2>Problem 6.4</h2>
+      This is the same a Problem 6.2. Assume the paleo current direction is 090 (east) and assume a plunge of 0 degrees.
+    <p>
+
+  </body>
+  <script type="module" defer>
+    import { pole_to_plane, plane_plane_intersection, average_pole, two_poles_to_plane, pole_rotate, plane_to_pole } from './math.js'
+    import { Pole, Plane2 } from './math.js'
+    import { Stereonet3D, gui as guix } from './net3d.js'
+
+    import { netjs, netjs_init, net_set, sleep, rot_animate, pole_rotate_animate, animate } from './stereonetjs.js'
+
+    let ids = []
+
+    document.getElementById("angle").addEventListener('input', (ev) => {
+        let pct = parseFloat(ev.target.value)
+        set_rotation_angle(pct)
+    })
+
+    document.getElementById("clear").addEventListener('change', (ev) => {
+        let value = ev.target.checked
+        console.log("clear", value)
+        if(value) {
+            n61.reset()
+            set_rotation_angle( parseFloat(document.getElementById("angle").value) )
+        }
+    })
+    
+    function set_rotation_angle(angle) {
+        document.getElementById("anglev").textContent = angle.toFixed(0)
+        let clear = document.getElementById("clear").checked
+        c61.reset()
+        poles.forEach(p => {
+            if(clear) {
+                n61.remove(p.id)
+            }
+            c61.add(p.rotate(axis0, angle))
+            n61.add(p.rotate(axis0, angle),p.id)
+        })
+    }
+    let axis0
+    let poles = []
+    let c61
+    let n61
+
+    async function p61() {
+
+        c61 = new Stereonet('#c61')
+        n61 = new Stereonet3D('n61')
+        let delay = 2000
+        net_set(c61)
+
+        let p1 = new Pole(45, 45, {color: "red", id: "p1"})
+        let p2 = new Pole(-35, 60, {color: "blue", id: "p2"})
+        let p3 = new Pole(80, 10, {color: "fuchsia", id: "p3"})
+        let p4 = new Pole(10, 40, {color: "green", id: "p4"})
+
+        axis0 = new Pole(0, 0)
+        // c61.add(p1)
+        // let p1id = n61.add(p1)
+        // //await sleep(500)
+        // c61.add(p2)
+        // let p2id = n61.add(p2)
+        // //await sleep(500)
+        // c61.add(p3)
+        // let p3id = n61.add(p3)
+        // //await sleep(500)
+        // c61.add(p4)
+        // let p4id = n61.add(p4)
+        // //await sleep(500)
+
+        //let angle = 50
+        let ang = (dt) => {
+            let v = Math.min(0 + dt * (angle-0) / delay, angle)
+            return (v < angle) ? v : undefined
+        }
+
+        /*n61.remove(p1id)
+        n61.remove(p2id)
+        n61.remove(p3id)
+        n61.remove(p4id)
+        animate(n61, (dt) => { return p1.rotate(axis0, ang(dt)) })
+        animate(n61, (dt) => { return p2.rotate(axis0, ang(dt)) })
+        animate(n61, (dt) => { return p3.rotate(axis0, ang(dt)) })
+        animate(n61, (dt) => { return p4.rotate(axis0, ang(dt)) })
+
+        animate(c61, (dt) => { return p1.rotate(axis0, ang(dt)) })
+        animate(c61, (dt) => { return p2.rotate(axis0, ang(dt)) })
+        animate(c61, (dt) => { return p3.rotate(axis0, ang(dt)) })
+        await animate(c61, (dt) => { return p4.rotate(axis0, ang(dt)) })
+
+        c61.add( p1.rotate(axis0, angle) )
+        c61.add( p2.rotate(axis0, angle) )
+        c61.add( p3.rotate(axis0, angle) )
+        c61.add( p4.rotate(axis0, angle) )
+
+        n61.add( p1.rotate(axis0, angle) )
+        n61.add( p2.rotate(axis0, angle) )
+        n61.add( p3.rotate(axis0, angle) )
+        n61.add( p4.rotate(axis0, angle) )
+        */
+        poles = [p1,p2,p3,p4]
+        let angle = parseFloat(document.getElementById("angle").value)
+        set_rotation_angle(angle)
+    }
+    p61()
+
+    document.getElementById("rotate").addEventListener('input', (ev) => {
+        let pct = Math.min(parseFloat(ev.target.value), 100-1e-8)
+        set_angle(pct)
+    })
+    
+    function set_angle(pct) {
+        let items = ["young_pole_rotate", "old_pole_rotate", "young_plane_rotate", "old_plane_rotate"]
+        items.forEach(v => n62.remove(v))
+
+        let angle = min_angle + pct/100 * (max_angle - min_angle)
+        document.getElementById("rotate_v").textContent = angle.toFixed(1)
+        let n1 = nyoung.rotate(axis, angle)
+        let n2 = nold.rotate(axis, angle)
+        n62.add( n1.plane().opacity(opacity).uid("young_plane_rotate"))
+        n62.add( n1.opacity(1.0).uid("young_pole_rotate"))
+        n62.add( n2.plane().opacity(opacity).uid("old_plane_rotate"))
+        n62.add( n2.opacity(1.0).uid("old_pole_rotate") )
+    }
+
+    let opacity  = 0.4
+    let n62 = null
+    let min_angle = 0
+    let max_angle = 0
+    let axis = null
+    let nyoung = null
+    let nold = null
+        
+    async function p62() {
+        let c62 = new Stereonet('#c62')
+        n62 = new Stereonet3D('n62')
+        let old = new Plane2(45, 20, {color: "red", opacity: 0.3})
+        let young = new Plane2(135, 40, {color: "blue", opacity: 0.3})
+        let delay = 1500
+
+        c62.add(old)
+        n62.add(old, "plane_old")
+        await sleep(delay)
+        c62.add(young)
+        n62.add(young, "plane_young")
+        await sleep(delay)
+        nold = old.normal().opacity(1.0)
+        nyoung = young.normal().opacity(1.0)
+
+        c62.add(nold)
+        let po0 = n62.add(nold)
+
+        c62.add(nyoung)
+        let py0 = n62.add(nyoung)
+        await sleep(delay)
+        await rot_animate(c62, (135-90), delay)
+        await sleep(delay)
+        //let y = pole_rotate(young.strike, 0, nyoung.trend, nyoung.plunge, 90 - nyoung.plunge)
+        //c62.add(new Pole(y.trend, y.plunge))
+        n62.remove(py0)
+        n62.remove(po0)
+        n62.remove("plane_old")
+        n62.remove("plane_young")
+
+        min_angle = 0
+        max_angle = 90 - nyoung.plunge
+        axis = new Pole(young.strike, 0)
+
+        let nyoung1 = nyoung.copy().opacity(opacity)
+        let nold1 = nold.copy().opacity(opacity)
+
+        animate(c62, (dt) => {
+            let angle = Math.min(min_angle + dt * (max_angle - min_angle)/delay, max_angle)
+            if(angle >= max_angle)
+                return undefined
+            let p = pole_rotate(young.strike, 0, nyoung.trend, nyoung.plunge, angle)
+            return new Pole(p.trend, p.plunge, { color: "blue" })
+        })
+        animate(c62, (dt) => {
+            let angle = Math.min(min_angle + dt * (max_angle - min_angle)/delay, max_angle)
+            if(angle >= max_angle)
+                return undefined
+            let p = pole_rotate(young.strike, 0, nold.trend, nold.plunge, angle)
+            return new Pole(p.trend, p.plunge, { color: "red" })
+        })
+
+        let tangle = (dt) => {
+            let angle = Math.min(min_angle + dt * (max_angle - min_angle)/delay, max_angle)
+            return (angle < max_angle) ? angle : undefined
+        }
+
+        animate(n62, (dt) => { return nyoung1.rotate(axis, tangle(dt))?.plane()  })
+        animate(n62, (dt) => { return nyoung.rotate(axis, tangle(dt)) })
+        animate(n62, (dt) => { return nold1.rotate(axis, tangle(dt))?.plane()  })
+        await animate(n62, (dt) => { return nold.rotate(axis, tangle(dt)) })
+
+        let y = nyoung.rotate(axis, max_angle-1e-8).uid("young_pole_rotate")
+        let o = nold.rotate(axis, max_angle-1e-8).uid("old_pole_rotate")
+        n62.add(y)
+        n62.add(o)
+        c62.add(y)
+        c62.add(o)
+
+        let yp = y.plane().opacity(0.3).uid("young_plane_rotate")
+        let op = o.plane().opacity(0.3).uid("old_plane_rotate")
+
+        n62.add(yp)
+        n62.add(op)
+        c62.add(yp)
+        c62.add(op)
+        await sleep(delay)
+        //c62.rotate(0)
+        await rot_animate(c62, -(135-90), delay)
+    }
+    p62()
+    /*
+    c51.add(new Plane({type: "plane", strike: -45, dip: 45}))
+    c51.add(new Plane({type: "plane", strike: 270, dip: 45}))
+    c51.add(new Plane({type: "plane", strike: 15, dip: 80}))
+    c51.add(new Plane({type: "plane", strike: 45+180, dip: 70}))
+    c51.add(new Plane({type: "pole", strike: 25, dip: 43, color: "fuchsia"}))
+
+    let items = {}
+
+    let c52 = new Stereonet("#c52")
+    let n52 = new Stereonet3D('n52')
+
+    let p1 = new Plane2( 35, 25, {color:"red"})
+    let p2 = new Plane2( 90, 45, {color:"blue"})
+
+    c52.add( p1 )
+    c52.add( p2 )
+
+    n52.add(p1, "Plane1")
+    n52.add(p2, "Plane2")
+
+    let n1 = p1.normal()
+    let n2 = p2.normal()
+
+    c52.add(n1)
+    c52.add(n2)
+
+    n52.add(n1, "Pole1")
+    n52.add(n2, "Pole2")
+
+    let x = p1.intersection(p2)
+    x.style.color = "fuchsia"
+    c52.add(x)
+
+    n52.add(x, "Intersection")
+
+    let a = n1.average(n2)
+    a.style.color = "lime"
+    c52.add(a)
+    n52.add(a, "Halfway")
+
+    let as = x.shared_plane(a)
+    as.style.color = "orange"
+    c52.add(as)
+
+    n52.add(as, "AxialSurface")
+
+    items.Plane1 = p1
+    items.Pole1 = n1
+    items.Plane2 = p2
+    items.Pole2 = n2
+    items.Intersection = x
+    items.Halfway = a
+    items.AxialSurface = as
+
+    cons
+    t gui = new guix.GUI({container: $('#n52')})
+    gui.close()
+    const obj = Object.fromEntries(Object.keys(items).map(key => [key, true]))
+    for(const key of Object.keys(items)) {
+        gui.add(obj, key)
+    }
+    gui.onChange( (ev) => {
+        if(!ev.value) {
+            n52.remove(ev.property)
+        } else {
+            n52.add(items[ev.property], ev.property)
+        }
+    })
+    */
+  </script>
+</html>
