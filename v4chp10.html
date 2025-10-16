@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>Chapter 10</title>
+    <meta charset="utf-8" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.css" integrity="sha384-D+9gmBxUQogRLqvARvNLmA9hS2x//eK1FhVb9PiU86gmcrBrJAQT8okdJ4LMp2uv" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/katex.min.js" integrity="sha384-483A6DwYfKeDa0Q52fJmxFXkcPCFfnXMoXblOkJ4JcA8zATN6Tm78UNL72AKk+0O" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0-rc.1/dist/contrib/auto-render.min.js" integrity="sha384-yACMu8JWxKzSp/C1YV86pzGiQ/l1YUfE8oPuahJQxzehAjEt2GiQuy/BIvl9KyeF" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+    <script language="javascript" type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+	  <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.js"></script>
+    
+    <script type="text/javascript">
+/*
+var plot;
+
+function update() {
+    var s1 = $("#sigma1").val() * 1.0;
+    var s3 = $("#sigma3").val() * 1.0;
+    draw_mohr_circle(s1, s3, false);
+}
+
+$(function() {
+    draw_mohr_circle(100, 20, true);
+    
+    $("#sigma1").on("input", function() {
+        var s1 = $(this).val() * 1.0;
+        var s3 = $("#sigma3").val() * 1.0;
+        if(s1 <= s3){
+            s1 = s3;
+        }
+        $(this).val( s1 );
+        $("#sigma1value").html( s1 );
+        update();
+    } );
+    $("#sigma3").on("input", function() {
+        var s1 = $("#sigma1").val() * 1.0;
+        var s3 = $(this).val() * 1.0;
+        if(s3 >= s1){
+            s3 = s1;
+        }
+        $(this).val( s3 );
+        $("#sigma3value").html( s3 );
+        update();
+    } );
+    $("#sigma1").val( 100 );
+    $("#sigma3").val( 20 );
+    $("#sigma1value").html( 100 );
+    $("#sigma3value").html( 20 );
+});
+function draw_mohr_circle(s1, s3, init){
+    var d1 = [];
+    var c = (s1+s3)/2.0;
+    var r = (s1-s3)/2.0;
+    //alert(s1 + " " + s3 + " " + c + " " + r );
+		for (var i = 0; i < 360; i += 5) {
+        var a = i * Math.PI / 180.0;
+			  d1.push([c + r * Math.cos(a), r * Math.sin(a)]);
+		}
+    var xmin = -120;
+    var xmax = 220;
+    var ymax = r * 1.10;
+
+    if(init) {
+        plot = $.plot("#placeholder", [
+            {
+	    	        data: d1,
+			          lines: { show: true, fill: false }, color: "black",
+		        },
+            { data: [[0, -xmax], [0, xmax]],  lines: { show: true, fill: false }, color: "black" },
+            { data: [[-xmax,0], [xmax,0 ]],   lines: { show: true, fill: false }, color: "black" },
+        ],
+               {
+                   xaxis: { min: xmin, max: xmax,},
+                   yaxis: { min: xmin-50, max: xmax-50}
+               }
+              );
+    } else {
+        //alert(d1[0]);
+        plot.setData([{ data: d1,                       lines: { show: true, fill: false  },  color: "black"},
+                      { data: [[0, -xmax], [0, xmax]],  lines: { show: true, fill: false }, color: "black" },
+                      { data: [[-xmax,0], [xmax,0 ]],   lines: { show: true, fill: false }, color: "black" },
+                     ]);
+        plot.setupGrid();
+        plot.draw();
+    }
+    */
+}
+    
+     </script>
+  <style>
+        .demo-container {
+    border: 0px solid red;
+	  box-sizing: border-box;
+  	width: 400px;
+	  height: 400px;
+	padding: 20px 15px 15px 15px;
+	margin: 15px auto 30px auto;
+}
+    #placeholder {
+     border: 0px solid red;
+    }
+    .demo-placeholder {
+	width: 100%;
+	height: 100%;
+	font-size: 14px;
+	line-height: 1.2em;
+}
+.name {
+    display: inline-block;
+    width: 35%;
+    font-size: 1.0em;
+    font-weight: bold;
+    padding-left: 5pt;
+    padding-right: 5pt;
+}
+.value {
+    display: inline-block;
+    width: 15%;
+    font-size: 1.0em;
+    font-weight: bold;
+    padding-left: 5pt;
+    padding-right: 5pt;
+}
+
+  </style>
+    
+  </head>
+  <body>
+    <a name="p01"/><h2>Problem 10.1</h2>
+
+    Given the primary normal stresses \(\sigma_1 \) and \( \sigma_3 \) determine the Normal and Shear streee on a fault plane
+    that strikes along \(\sigma_2\) and dips at an angle
+    <p>
+      The direction of \(\sigma_2\) is usually along the fault plane
+    <p>
+      \( \sigma_1 \) is vertical (as stated in the problem)
+    <p>
+      \( \sigma_3 \) is horizontal (as stated in the problem)
+    <p>
+      \(\theta \) is the angle from the horizontal (same as the dip) for *this* problem. See figure P10.1 for help.
+    <p>
+    \(\sigma_n = \dfrac{\sigma_1 + \sigma_3}{2} + \dfrac{\sigma_1 - \sigma_3}{2} \cos (2\theta)\)
+
+    <p>
+    \(\sigma_s = \dfrac{\sigma_1 - \sigma_3}{2} \sin (2\theta)\)
+    <!-- 
+    <div id="content">
+		  <div class="demo-container">
+			  <div id="placeholder" class="demo-placeholder"></div>
+		  </div>
+	  </div>
+
+    <div id="Sigma1">
+      <span class="name">Sigma 1</span>
+      <input id="sigma1" type="range", min="-100", max="200", step="1" />
+      <span id="sigma1value" class="value"></span>
+    </div>
+    <br/>
+    <div id="Sigma3">
+      <span class="name">Sigma 3</span>
+      <input id="sigma3" type="range", min="-100", max="200", step="1" />
+      <span id="sigma3value" class="value"></span>
+    </div>
+    -->
+    <a name="p02"><h2>Problem 10.2</h2>
+      <p>
+        Plot the normal and shear stress on the graph provided in P10.1
+      <p>
+        Plot the Mohr Circle with \( \sigma_1 = 100 MPa\) and \( \sigma_3 = 20 MPa\) 
+
+      <a name="p03"><h2>Problem 10.3</h2>
+        This is similar to Problem 10.1 with different normal stress values and fault dip
+      </p>
+      <a name="p04" ><h2>Problem 10.5</h2>
+        
+      <ol>
+          <li>Plot the experiments.
+          <li>Draw the failure envelope. It is a straight line that touches all experiments at a single point
+          <li>Meausure the slope of the line or angle of internal friction, \(\phi\).
+          <li>Convert \(\phi\) to the columb coefficient, \(\mu\) using \(\mu = \tan \phi\)
+          <li>Finally, determine the angle of fracture plane with: $$\theta = 45^\circ + \frac{\phi}{2}$$
+        </ol>
+        
+      <a name="p04"><h2>Problem 10.9</h2>
+        <p>
+          Oh that is a lot of text
+
+        <p>
+          Plot the Mohr Circle for the regional stress state \( \sigma_1 = 10 Mpa \) and \( \sigma_3 = 6 MPa \)
+        <p>
+          Draw a Failure envelope with \( \mu = 0.4 \) (the slope) and a Cohesion \( C = 0 \)
+        <p>
+          \( \sigma_s = \mu \sigma_1 + C \) (form of \( y=  mx + b \) )
+
+        <p>
+          Shift the Mohr circle until it intersects with the Failure envelope.  This is the same as increasing the pore fluid pressure or subtracting some pressure from the normal stresses
+        <p>
+          How far you moved the circle is the Pore fluid pressure
+  </body>
+</html>
