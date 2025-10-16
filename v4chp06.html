@@ -55,9 +55,13 @@
       of the stereonet.  This make the pole vertical and the bed horizontal
     <p>Rotate the <span style="color: red">older bed</span> in the same direction and the same angle that the younger bed was rotated
     <p>Convert the older bed's pole to a <span style="color: lime">plane</span> and indicate its attitude
+      <p>
+        <button id="run62">Show</button>
+        <p>
       <canvas id="c62" width="500" height="500" style="border:0px;"></canvas>
       <div id="n62" style="width: 500px; height: 500px; margin: auto;"></div>
-
+      
+      <label>Pole Rotation Angle</label>
       <input type="range" min="0" max="100" value="0" id="rotate">
       <label for="rotate" id="rotate_v"></label>
       <a name="p03"/><h2>Problem 6.3</h2>
@@ -191,6 +195,7 @@
     }
 
     let opacity  = 0.4
+    let c62 = null
     let n62 = null
     let min_angle = 0
     let max_angle = 0
@@ -199,13 +204,20 @@
     let nold = null
     let nyoung2 = null
     let nold2 = null
-        
+
+    document.getElementById('run62').addEventListener('click', (ev) => {
+        p62()
+    })
+
+    c62 = new Stereonet('#c62')
+    n62 = new Stereonet3D('n62')
+    
     async function p62() {
-        let c62 = new Stereonet('#c62')
-        n62 = new Stereonet3D('n62')
+        c62.reset()
+        n62.reset()
         let old = new Plane2(45, 20, {color: "red", opacity: 0.3})
         let young = new Plane2(135, 40, {color: "blue", opacity: 0.3})
-        let delay = 300
+        let delay = 1200
 
         c62.add(old)
         n62.add(old, "plane_old")
@@ -278,6 +290,8 @@
         n62.add(o)
         c62.add(y)
         c62.add(o)
+
+        await sleep(delay)
 
         let yp = y.plane().opacity(0.3).uid("young_plane_rotate")
         let op = o.plane().opacity(0.3).uid("old_plane_rotate")
